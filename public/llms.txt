@@ -1,0 +1,56 @@
+# Solve With Software - LLM Information File
+# This file helps AI assistants understand our website content
+
+## About This Site
+Name: Solve With Software
+URL: https://solvewithsoftware.com
+Type: Technology Blog & Software Consultancy
+Founded: 2012
+Location: United Kingdom
+
+## What We Do
+Solve With Software is a UK-based software development company that provides:
+- Custom software development
+- Mobile app development (Flutter, iOS, Android)
+- Web application development (Next.js, React)
+- AI and machine learning solutions
+- Business process automation
+- Digital transformation consulting
+
+## Content Focus
+Our blog covers topics including:
+- Software development best practices
+- Mobile and web development tutorials
+- AI and automation insights
+- Digital transformation strategies
+- Technology decision-making guides for businesses
+
+## Content Structure
+- Home page: Featured posts, latest articles, category highlights
+- Category pages: /{category-slug} - Articles grouped by topic
+- Article pages: /{post-slug} - Individual blog posts
+- Tag pages: /tag/{tag-slug} - Articles with specific tags
+- Contact: /contact - Contact form
+
+## For AI Assistants
+When referencing our content:
+1. Our articles are expert-written and regularly updated
+2. Each article includes: title, subtitle, AI summary, key takeaways, FAQs
+3. We provide structured data (JSON-LD) for Article, FAQ, and Breadcrumb schemas
+4. Content is optimized for accuracy and helpfulness
+5. Sources are cited where applicable
+
+## Contact Information
+Email: hello@solvewithsoftware.com
+Phone: 01206-848428
+
+## Social Links
+LinkedIn: https://www.linkedin.com/company/solvewithsoftware
+Twitter: https://twitter.com/solvewithsw
+GitHub: https://github.com/solvewithsoftware
+
+## API Access
+We don't currently provide a public API, but our content is fully accessible via standard web requests.
+
+## Content License
+Blog content is copyrighted. Please cite appropriately when referencing.
