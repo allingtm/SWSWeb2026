@@ -43,7 +43,7 @@ export function Footer({ categories }: FooterProps) {
       <Container className="pb-8 pt-16 sm:pt-24">
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="space-y-8">
-            <Link href="/" className="flex items-center gap-2">
+            <Link href="/" className="flex items-center">
               <Image
                 src="/solve-with-software-logo.png"
                 alt="Solve With Software"
@@ -51,9 +51,6 @@ export function Footer({ categories }: FooterProps) {
                 height={32}
                 className="h-8 w-auto"
               />
-              <span className="text-xl font-bold text-foreground">
-                Solve With Software
-              </span>
             </Link>
             <p className="text-sm leading-6 text-muted-foreground">
               Expert insights on software development, AI, automation, and digital
