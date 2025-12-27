@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
@@ -14,9 +15,17 @@ import { Badge } from "@/components/ui/badge";
 import { Container } from "@/components/ui/container";
 import { formatDate } from "@/lib/utils";
 import { EnquiryCTAInline } from "./enquiry-cta-inline";
-import { EnquiryCTAFloating } from "./enquiry-cta-floating";
-import { EnquiryModal } from "./enquiry-modal";
 import type { BlogPostWithRelations } from "@/types";
+
+// Lazy-load enquiry components - only loaded when post has enquiry configured
+const EnquiryCTAFloating = dynamic(
+  () => import("./enquiry-cta-floating").then((mod) => mod.EnquiryCTAFloating),
+  { ssr: false }
+);
+const EnquiryModal = dynamic(
+  () => import("./enquiry-modal").then((mod) => mod.EnquiryModal),
+  { ssr: false }
+);
 
 interface PostContentProps {
   post: BlogPostWithRelations;

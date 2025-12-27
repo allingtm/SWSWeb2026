@@ -3,14 +3,23 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, User, Search } from "lucide-react";
-import { cn } from "@/lib/utils";
+import dynamic from "next/dynamic";
+import { Menu, User, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "./theme-toggle";
-import { SearchModal } from "@/components/blog/search-modal";
 import type { BlogCategory } from "@/types";
+
+// Lazy-load SearchModal - only loaded when search is triggered
+const SearchModal = dynamic(
+  () => import("@/components/blog/search-modal").then((mod) => mod.SearchModal),
+  { ssr: false }
+);
+
+// Lazy-load MobileMenu - defers framer-motion until menu is opened
+const MobileMenu = dynamic(
+  () => import("./mobile-menu").then((mod) => mod.MobileMenu),
+  { ssr: false }
+);
 
 interface HeaderProps {
   categories: BlogCategory[];
@@ -19,7 +28,6 @@ interface HeaderProps {
 export function Header({ categories }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const pathname = usePathname();
 
   return (
     <>
@@ -67,106 +75,14 @@ export function Header({ categories }: HeaderProps) {
         </nav>
       </header>
 
-      {/* Slide-out menu - Outside header to avoid containment issues */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[100] bg-black/50"
-              onClick={() => setMobileMenuOpen(false)}
-            />
-            <motion.div
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 bottom-0 z-[100] w-full overflow-y-auto bg-background px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-border"
-            >
-              <div className="flex items-center justify-between">
-                <Link href="/" className="flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
-                  <Image
-                    src="/solve-with-software-logo.png"
-                    alt="Solve With Software"
-                    width={176}
-                    height={32}
-                    className="h-8 w-auto"
-                  />                 
-                </Link>
-                <button
-                  type="button"
-                  className="-m-2.5 rounded-md p-2.5 text-foreground"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <span className="sr-only">Close menu</span>
-                  <X className="h-6 w-6" aria-hidden="true" />
-                </button>
-              </div>
-              <div className="mt-6 flow-root">
-                <div className="-my-6 divide-y divide-border">
-                  {/* Categories */}
-                  <div className="space-y-1 py-6">
-                    <p className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      Explore
-                    </p>
-                    <Link
-                      href="/"
-                      className={cn(
-                        "block rounded-lg px-3 py-2 text-base font-medium",
-                        pathname === "/"
-                          ? "bg-primary/10 text-primary"
-                          : "text-foreground hover:bg-muted"
-                      )}
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Latest
-                    </Link>
-                    {categories.map((category) => (
-                      <Link
-                        key={category.id}
-                        href={`/${category.slug}`}
-                        className={cn(
-                          "block rounded-lg px-3 py-2 text-base font-medium",
-                          pathname === `/${category.slug}`
-                            ? "bg-primary/10 text-primary"
-                            : "text-foreground hover:bg-muted"
-                        )}
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        {category.name}
-                      </Link>
-                    ))}
-                  </div>
-                  {/* Actions */}
-                  <div className="py-6 space-y-2">
-                    <Link
-                      href="/about"
-                      className={cn(
-                        "block rounded-lg px-3 py-2 text-base font-medium",
-                        pathname === "/about"
-                          ? "bg-primary/10 text-primary"
-                          : "text-foreground hover:bg-muted"
-                      )}
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      About Us
-                    </Link>
-                    <Button asChild className="w-full">
-                      <Link href="/contact" onClick={() => setMobileMenuOpen(false)}>
-                        Contact Us
-                      </Link>
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      {/* Lazy-loaded mobile menu */}
+      <MobileMenu
+        isOpen={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+        categories={categories}
+      />
 
-      {/* Search Modal */}
+      {/* Lazy-loaded search modal */}
       <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   );
