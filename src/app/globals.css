@@ -63,6 +63,11 @@
   border-color: var(--border);
 }
 
+html,
+body {
+  overflow-x: hidden;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
