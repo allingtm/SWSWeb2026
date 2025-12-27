@@ -3,12 +3,15 @@ import { Metadata } from "next";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { TagListing } from "@/components/blog";
+import { JsonLd } from "@/components/seo/json-ld";
 import {
   getNavCategories,
   getTagBySlug,
   getPostsByTagSlug,
 } from "@/lib/supabase/queries";
 import { generateMetadata as generateSiteMetadata } from "@/lib/seo/metadata";
+import { generateBreadcrumbSchema } from "@/lib/seo/structured-data";
+import { siteConfig } from "@/lib/seo/constants";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -50,8 +53,15 @@ export default async function TagPage({ params }: PageProps) {
 
   const posts = await getPostsByTagSlug(slug, 24);
 
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: "Home", url: siteConfig.url },
+    { name: "Tags", url: `${siteConfig.url}/tag` },
+    { name: tag.name, url: `${siteConfig.url}/tag/${tag.slug}` },
+  ]);
+
   return (
     <>
+      <JsonLd data={breadcrumbSchema} />
       <Header categories={navCategories} />
       <main className="min-h-screen">
         <TagListing tag={tag} posts={posts} />

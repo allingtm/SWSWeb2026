@@ -3,8 +3,10 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Container } from "@/components/ui/container";
 import { ContactForm } from "@/components/contact/contact-form";
+import { JsonLd } from "@/components/seo/json-ld";
 import { getNavCategories } from "@/lib/supabase/queries";
 import { generateMetadata as generateSiteMetadata } from "@/lib/seo/metadata";
+import { generateLocalBusinessSchema } from "@/lib/seo/structured-data";
 import { siteConfig } from "@/lib/seo/constants";
 
 export const metadata: Metadata = generateSiteMetadata({
@@ -15,9 +17,11 @@ export const metadata: Metadata = generateSiteMetadata({
 
 export default async function ContactPage() {
   const navCategories = await getNavCategories();
+  const localBusinessSchema = generateLocalBusinessSchema();
 
   return (
     <>
+      <JsonLd data={localBusinessSchema} />
       <Header categories={navCategories} />
       <main className="min-h-screen py-12">
         <Container className="max-w-4xl">

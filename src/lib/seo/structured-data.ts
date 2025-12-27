@@ -199,3 +199,104 @@ export function generateCollectionPageSchema(
     ),
   };
 }
+
+// LocalBusiness schema for contact/about pages
+export function generateLocalBusinessSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    "@id": `${siteConfig.url}/#localbusiness`,
+    name: siteConfig.name,
+    description: siteConfig.description,
+    url: siteConfig.url,
+    telephone: siteConfig.phone,
+    email: siteConfig.email,
+    foundingDate: siteConfig.foundingDate,
+    logo: `${siteConfig.url}/logo.png`,
+    image: siteConfig.ogImage,
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Colchester",
+      addressRegion: "Essex",
+      addressCountry: "GB",
+    },
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: 51.922665,
+      longitude: 0.928908,
+    },
+    areaServed: [
+      {
+        "@type": "Country",
+        name: "United Kingdom",
+      },
+      {
+        "@type": "Country",
+        name: "United States",
+      },
+    ],
+    serviceType: [
+      "Custom Software Development",
+      "Mobile App Development",
+      "Web Application Development",
+      "AI & Machine Learning Solutions",
+      "Business Process Automation",
+      "Digital Transformation Consulting",
+    ],
+    priceRange: "$$",
+    sameAs: [
+      "https://www.linkedin.com/company/solvewithsoftware",
+      "https://twitter.com/solvewithsw",
+      "https://github.com/solvewithsoftware",
+    ],
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "sales",
+      email: siteConfig.email,
+      telephone: siteConfig.phone,
+      availableLanguage: "English",
+    },
+  };
+}
+
+// VideoObject schema for embedded videos
+export function generateVideoObjectSchema(video: {
+  name: string;
+  description: string;
+  thumbnailUrl: string;
+  uploadDate: string;
+  duration?: string;
+  contentUrl: string;
+  embedUrl?: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    name: video.name,
+    description: video.description,
+    thumbnailUrl: video.thumbnailUrl,
+    uploadDate: video.uploadDate,
+    ...(video.duration && { duration: video.duration }),
+    contentUrl: video.contentUrl,
+    ...(video.embedUrl && { embedUrl: video.embedUrl }),
+  };
+}
+
+// AudioObject schema for embedded audio
+export function generateAudioObjectSchema(audio: {
+  name: string;
+  description?: string;
+  duration?: string;
+  contentUrl: string;
+  uploadDate?: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "AudioObject",
+    name: audio.name,
+    ...(audio.description && { description: audio.description }),
+    ...(audio.duration && { duration: audio.duration }),
+    contentUrl: audio.contentUrl,
+    ...(audio.uploadDate && { uploadDate: audio.uploadDate }),
+  };
+}

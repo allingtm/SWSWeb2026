@@ -35,6 +35,12 @@ export const metadata: Metadata = {
     ],
     apple: "/logo.png",
   },
+  alternates: {
+    types: {
+      "application/rss+xml": "/feed.xml",
+      "application/atom+xml": "/atom.xml",
+    },
+  },
   openGraph: {
     type: "website",
     locale: "en_GB",
