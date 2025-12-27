@@ -5,10 +5,15 @@ import { JsonLd } from "@/components/seo/json-ld";
 import {
   FeaturedPosts,
   CategoryPills,
+  LatestPosts,
+  CategorySection,
 } from "@/components/blog";
 import {
   getNavCategories,
   getFeaturedPosts,
+  getHomepageCategories,
+  getLatestPosts,
+  getPostsByCategory,
 } from "@/lib/supabase/queries";
 import { generateMetadata as generateSiteMetadata } from "@/lib/seo/metadata";
 import {
@@ -27,10 +32,23 @@ export const revalidate = 60; // Revalidate every minute
 
 export default async function HomePage() {
   // Fetch all data in parallel
-  const [navCategories, featuredPosts] = await Promise.all([
+  const [navCategories, featuredPosts, homepageCategories, latestPosts] = await Promise.all([
     getNavCategories(),
     getFeaturedPosts(3),
+    getHomepageCategories(),
+    getLatestPosts(6),
   ]);
+
+  // Fetch posts for each homepage category (6 posts each)
+  const categoriesWithPosts = await Promise.all(
+    homepageCategories.map(async (category) => ({
+      category,
+      posts: await getPostsByCategory(category.id, 6),
+    }))
+  );
+
+  // Filter out empty categories
+  const nonEmptyCategories = categoriesWithPosts.filter(({ posts }) => posts.length > 0);
 
   const organizationSchema = generateOrganizationSchema();
   const websiteSchema = generateWebSiteSchema();
@@ -62,6 +80,20 @@ export default async function HomePage() {
             <FeaturedPosts posts={featuredPosts} />
           </Container>
         </section>
+
+        {/* Latest Section */}
+        <section className="border-t border-border">
+          <Container>
+            <LatestPosts posts={latestPosts} title="Latest" />
+          </Container>
+        </section>
+
+        {/* Category Sections - ordered by display_order, empty filtered out */}
+        {nonEmptyCategories.map(({ category, posts }) => (
+          <Container key={category.id}>
+            <CategorySection category={category} posts={posts} />
+          </Container>
+        ))}
       </main>
       <Footer categories={navCategories} />
     </>

@@ -58,7 +58,7 @@ export async function getCategoryBySlug(slug: string): Promise<BlogCategory | nu
     .from('sws2026_blog_categories')
     .select('*')
     .eq('slug', slug)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error('Error fetching category:', error);

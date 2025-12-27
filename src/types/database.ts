@@ -75,6 +75,8 @@ export interface BlogPost {
   read_time_minutes: number | null;
   word_count: number | null;
   view_count: number;
+  survey_id: string | null;
+  enquiry_cta_title: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -84,6 +86,7 @@ export interface BlogPostWithRelations extends BlogPost {
   category: BlogCategory;
   tags: BlogTag[];
   faqs: BlogFaq[];
+  survey: Survey | null;
 }
 
 export interface BlogFaq {
@@ -128,4 +131,55 @@ export interface ContactSubmission {
   message: string;
   status: 'new' | 'read' | 'replied' | 'archived';
   created_at: string;
+}
+
+export interface MediaItem {
+  id: string;
+  filename: string;
+  original_filename: string;
+  storage_path: string;
+  public_url: string;
+  file_type: 'image' | 'video' | 'audio';
+  mime_type: string;
+  file_size: number;
+  width: number | null;
+  height: number | null;
+  duration: number | null;
+  alt_text: string | null;
+  caption: string | null;
+  tags: string[];
+  metadata: Record<string, unknown>;
+  uploaded_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// Survey types for enquiry forms
+export interface Survey {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  json_definition: Record<string, unknown>;
+  status: 'active' | 'inactive';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Enquiry {
+  id: string;
+  survey_id: string;
+  post_id: string | null;
+  response_data: Record<string, unknown>;
+  respondent_email: string | null;
+  respondent_name: string | null;
+  status: 'new' | 'read' | 'archived';
+  source_url: string | null;
+  user_agent: string | null;
+  created_at: string;
+}
+
+export interface EnquiryWithRelations extends Enquiry {
+  survey: Survey;
+  post: BlogPost | null;
 }

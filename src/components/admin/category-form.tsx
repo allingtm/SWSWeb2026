@@ -2,10 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Save, Trash2 } from "lucide-react";
+import { Save, Trash2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { BlogCategory } from "@/types";
+import type { AICategoryContent } from "@/lib/ai/types";
+import { useCategoryAIGeneration } from "@/hooks/use-category-ai-generation";
+import { CategoryAIInputModal } from "./category-ai-input-modal";
+import { CategoryAISelectionModal } from "./category-ai-selection-modal";
 
 interface CategoryFormProps {
   category?: BlogCategory;
@@ -51,6 +55,19 @@ export function CategoryForm({ category }: CategoryFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [slugEdited, setSlugEdited] = useState(isEditing);
+
+  // AI generation state
+  const [showInputModal, setShowInputModal] = useState(false);
+  const [showSelectionModal, setShowSelectionModal] = useState(false);
+  const { generate, isGenerating, error: aiError, generatedContent, reset: resetAI } = useCategoryAIGeneration({
+    onSuccess: () => {
+      setShowInputModal(false);
+      setShowSelectionModal(true);
+    },
+    onError: (error) => {
+      setError(error);
+    },
+  });
 
   // Auto-generate slug from name
   useEffect(() => {
@@ -107,6 +124,26 @@ export function CategoryForm({ category }: CategoryFormProps) {
     }
   };
 
+  const handleAIGenerate = (name: string, prompt?: string) => {
+    generate({ name, prompt });
+  };
+
+  const handleApplyAIContent = (selectedContent: Partial<AICategoryContent>) => {
+    setFormData((prev) => ({
+      ...prev,
+      ...(selectedContent.subtitle && { subtitle: selectedContent.subtitle }),
+      ...(selectedContent.description && { description: selectedContent.description }),
+      ...(selectedContent.meta_title && { meta_title: selectedContent.meta_title }),
+      ...(selectedContent.meta_description && { meta_description: selectedContent.meta_description }),
+    }));
+    resetAI();
+  };
+
+  const handleCloseSelectionModal = () => {
+    setShowSelectionModal(false);
+    resetAI();
+  };
+
   const handleDelete = async () => {
     if (!category || !confirm("Are you sure you want to delete this category?")) return;
 
@@ -138,17 +175,29 @@ export function CategoryForm({ category }: CategoryFormProps) {
         <h1 className="text-2xl font-bold text-foreground">
           {isEditing ? "Edit Category" : "New Category"}
         </h1>
-        {isEditing && (
+        <div className="flex items-center gap-2">
           <Button
-            variant="destructive"
+            type="button"
+            variant="outline"
             size="sm"
-            onClick={handleDelete}
-            disabled={isLoading}
+            onClick={() => setShowInputModal(true)}
+            disabled={isLoading || isGenerating}
           >
-            <Trash2 className="h-4 w-4 mr-2" />
-            Delete
+            <Sparkles className="h-4 w-4 mr-2" />
+            Generate with AI
           </Button>
-        )}
+          {isEditing && (
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleDelete}
+              disabled={isLoading}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete
+            </Button>
+          )}
+        </div>
       </div>
 
       {error && (
@@ -373,6 +422,31 @@ export function CategoryForm({ category }: CategoryFormProps) {
           </Button>
         </div>
       </form>
+
+      {/* AI Input Modal */}
+      <CategoryAIInputModal
+        isOpen={showInputModal}
+        onClose={() => setShowInputModal(false)}
+        onGenerate={handleAIGenerate}
+        isGenerating={isGenerating}
+        initialName={formData.name}
+      />
+
+      {/* AI Selection Modal */}
+      {generatedContent && (
+        <CategoryAISelectionModal
+          isOpen={showSelectionModal}
+          onClose={handleCloseSelectionModal}
+          generatedContent={generatedContent}
+          existingFields={{
+            subtitle: formData.subtitle,
+            description: formData.description,
+            meta_title: formData.meta_title,
+            meta_description: formData.meta_description,
+          }}
+          onApply={handleApplyAIContent}
+        />
+      )}
     </div>
   );
 }

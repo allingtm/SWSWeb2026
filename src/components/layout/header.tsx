@@ -5,10 +5,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, User } from "lucide-react";
+import { Menu, X, User, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "./theme-toggle";
+import { SearchModal } from "@/components/blog/search-modal";
 import type { BlogCategory } from "@/types";
 
 interface HeaderProps {
@@ -17,6 +18,7 @@ interface HeaderProps {
 
 export function Header({ categories }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const pathname = usePathname();
 
   return (
@@ -38,6 +40,14 @@ export function Header({ categories }: HeaderProps) {
 
           {/* Right side - All screens */}
           <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSearchOpen(true)}
+            >
+              <Search className="h-5 w-5" />
+              <span className="sr-only">Search</span>
+            </Button>
             <ThemeToggle />
             <Button variant="ghost" size="icon" asChild>
               <Link href="/login">
@@ -99,7 +109,7 @@ export function Header({ categories }: HeaderProps) {
                   {/* Categories */}
                   <div className="space-y-1 py-6">
                     <p className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      Categories
+                      Explore
                     </p>
                     <Link
                       href="/"
@@ -111,7 +121,7 @@ export function Header({ categories }: HeaderProps) {
                       )}
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Explore
+                      Latest
                     </Link>
                     {categories.map((category) => (
                       <Link
@@ -131,6 +141,18 @@ export function Header({ categories }: HeaderProps) {
                   </div>
                   {/* Actions */}
                   <div className="py-6 space-y-2">
+                    <Link
+                      href="/about"
+                      className={cn(
+                        "block rounded-lg px-3 py-2 text-base font-medium",
+                        pathname === "/about"
+                          ? "bg-primary/10 text-primary"
+                          : "text-foreground hover:bg-muted"
+                      )}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      About Us
+                    </Link>
                     <Button asChild className="w-full">
                       <Link href="/contact" onClick={() => setMobileMenuOpen(false)}>
                         Contact Us
@@ -143,6 +165,9 @@ export function Header({ categories }: HeaderProps) {
           </>
         )}
       </AnimatePresence>
+
+      {/* Search Modal */}
+      <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   );
 }

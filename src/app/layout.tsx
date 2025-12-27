@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/layout/theme-provider";
+import {
+  CookieConsentProvider,
+  CookieBanner,
+} from "@/components/cookies";
 import { siteConfig } from "@/lib/seo/constants";
 import "./globals.css";
 
@@ -83,7 +87,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <CookieConsentProvider>
+            {children}
+            <CookieBanner />
+          </CookieConsentProvider>
         </ThemeProvider>
       </body>
     </html>

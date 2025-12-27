@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Container } from "@/components/ui/container";
+import { CookiePreferencesButton } from "@/components/cookies";
 import type { BlogCategory } from "@/types";
 
 interface FooterProps {
@@ -9,11 +10,13 @@ interface FooterProps {
 
 const navigation = {
   company: [
+    { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },
   ],
   legal: [
     { name: "Privacy Policy", href: "/privacy" },
     { name: "Terms of Service", href: "/terms" },
+    { name: "Cookie Policy", href: "/cookie-policy" },
   ],
   social: [
     {
@@ -21,12 +24,12 @@ const navigation = {
       href: "https://www.linkedin.com/company/solvewithsoftware",
     },
     {
-      name: "Twitter",
-      href: "https://twitter.com/solvewithsw",
+      name: "TikTok",
+      href: "https://www.tiktok.com/@solvewithsoftware",
     },
     {
-      name: "GitHub",
-      href: "https://github.com/solvewithsoftware",
+      name: "YouTube",
+      href: "https://www.youtube.com/@solvewithsoftware",
     },
   ],
 };
@@ -123,6 +126,9 @@ export function Footer({ categories }: FooterProps) {
                       </Link>
                     </li>
                   ))}
+                  <li>
+                    <CookiePreferencesButton />
+                  </li>
                 </ul>
               </div>
               <div className="mt-10 md:mt-0">

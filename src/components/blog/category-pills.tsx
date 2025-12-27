@@ -25,7 +25,7 @@ export function CategoryPills({ categories, showAllArticles = true }: CategoryPi
               : "border-border text-foreground hover:bg-muted"
           )}
         >
-          Explore
+          Latest
         </Link>
       )}
       {categories.map((category) => (

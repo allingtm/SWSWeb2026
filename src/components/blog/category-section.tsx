@@ -19,7 +19,7 @@ export function CategorySection({ category, posts }: CategorySectionProps) {
           href={`/${category.slug}`}
           className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
         >
-          View All
+          See all...
           <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
@@ -38,9 +38,9 @@ export function CategorySection({ category, posts }: CategorySectionProps) {
           ))}
         </div>
 
-        {/* Desktop: Grid */}
-        <div className="hidden lg:grid lg:grid-cols-4 gap-6">
-          {posts.slice(0, 4).map((post) => (
+        {/* Desktop: 3x2 Grid */}
+        <div className="hidden lg:grid lg:grid-cols-3 gap-6">
+          {posts.slice(0, 6).map((post) => (
             <PostCard key={post.id} post={post} />
           ))}
         </div>

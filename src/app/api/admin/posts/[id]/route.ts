@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getPostById } from "@/lib/supabase/queries/admin";
 import { updatePost, deletePost, updatePostTags, updatePostFaqs } from "@/lib/supabase/mutations/posts";
+import { embedBlogPost } from "@/lib/ai/embeddings";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -70,6 +71,13 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       if (faqError) {
         console.error("Error updating FAQs:", faqError);
       }
+    }
+
+    // Auto-generate embedding when post is published
+    if (post.status === "published") {
+      embedBlogPost(id).catch((err) => {
+        console.error("Error generating embedding:", err);
+      });
     }
 
     return NextResponse.json({ post });

@@ -8,7 +8,8 @@ const POST_SELECT = `
   tags:sws2026_blog_post_tags(
     tag:sws2026_blog_tags(*)
   ),
-  faqs:sws2026_blog_faqs(*)
+  faqs:sws2026_blog_faqs(*),
+  survey:sws2026_surveys(*)
 `;
 
 function transformPost(data: any): BlogPostWithRelations {
@@ -18,6 +19,7 @@ function transformPost(data: any): BlogPostWithRelations {
     category: data.category,
     tags: data.tags?.map((t: any) => t.tag).filter(Boolean) || [],
     faqs: data.faqs || [],
+    survey: data.survey || null,
   };
 }
 

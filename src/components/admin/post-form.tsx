@@ -1,16 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Save, Eye, Trash2, ChevronDown, ChevronUp, Plus, X } from "lucide-react";
+import { Save, Eye, Trash2, ChevronDown, ChevronUp, Plus, X, Upload, FileText, ClipboardPaste, Image, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MarkdownEditor } from "./markdown-editor";
 import { StatusBadge } from "./status-badge";
 import { AIGenerateButton } from "./ai-generate-button";
 import { AIGenerationModal, type SelectedContent } from "./ai-generation-modal";
+import { SuggestableField } from "./suggestable-field";
 import { useAIGeneration } from "@/hooks/use-ai-generation";
+import { MediaPickerModal } from "./media-picker-modal";
+import { AIImageModal } from "./ai-image-modal";
 import { cn } from "@/lib/utils";
-import type { BlogPostWithRelations, BlogCategory, BlogTag, BlogFaq } from "@/types";
+import type { BlogPostWithRelations, BlogCategory, BlogTag, BlogFaq, MediaItem, Survey } from "@/types";
 import type { AIGeneratedContent } from "@/lib/ai/types";
 
 interface PostFormProps {
@@ -101,6 +104,16 @@ export function PostForm({ post, categories, tags, authorId }: PostFormProps) {
   const [slugEdited, setSlugEdited] = useState(isEditing);
   const [showAiModal, setShowAiModal] = useState(false);
   const [generatedContent, setGeneratedContent] = useState<AIGeneratedContent | null>(null);
+  const [showImportDialog, setShowImportDialog] = useState(false);
+  const [importContent, setImportContent] = useState("");
+  const [showImportMenu, setShowImportMenu] = useState(false);
+  const [showMediaPicker, setShowMediaPicker] = useState(false);
+  const [showFeaturedImagePicker, setShowFeaturedImagePicker] = useState(false);
+  const [showAIImageModal, setShowAIImageModal] = useState(false);
+  const [aiImageTarget, setAIImageTarget] = useState<"content" | "featured">("content");
+  const [surveys, setSurveys] = useState<Survey[]>([]);
+  const [selectedSurveyId, setSelectedSurveyId] = useState<string>(post?.survey_id || "");
+  const [enquiryCTATitle, setEnquiryCTATitle] = useState(post?.enquiry_cta_title || "");
 
   const { generate, isGenerating, error: aiError } = useAIGeneration({
     onSuccess: (data) => {
@@ -108,6 +121,103 @@ export function PostForm({ post, categories, tags, authorId }: PostFormProps) {
       setShowAiModal(true);
     },
   });
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImportMarkdown = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target?.result as string;
+      if (content) {
+        setFormData((prev) => ({ ...prev, content }));
+      }
+    };
+    reader.readAsText(file);
+
+    // Reset the input so the same file can be selected again
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const handleApplyInlineImport = () => {
+    if (importContent.trim()) {
+      setFormData((prev) => ({ ...prev, content: importContent }));
+      setShowImportDialog(false);
+      setImportContent("");
+    }
+  };
+
+  const handleInsertMedia = (media: MediaItem | MediaItem[]) => {
+    const items = Array.isArray(media) ? media : [media];
+    const shortcodes = items.map((item) => {
+      const tagName =
+        item.file_type === "image"
+          ? "MediaImage"
+          : item.file_type === "video"
+          ? "MediaVideo"
+          : "MediaAudio";
+      return `<${tagName} id="${item.id}" />`;
+    });
+    const insertText = shortcodes.join("\n\n");
+
+    // Append to content with newlines
+    setFormData((prev) => ({
+      ...prev,
+      content: prev.content ? `${prev.content}\n\n${insertText}` : insertText,
+    }));
+    setShowMediaPicker(false);
+  };
+
+  const handleSelectFeaturedImage = (media: MediaItem | MediaItem[]) => {
+    const item = Array.isArray(media) ? media[0] : media;
+    if (item && item.file_type === "image") {
+      setFormData((prev) => ({
+        ...prev,
+        featured_image: item.public_url,
+        featured_image_alt: item.alt_text || prev.featured_image_alt,
+      }));
+    }
+    setShowFeaturedImagePicker(false);
+  };
+
+  const handleAIImageSaved = (media: MediaItem) => {
+    if (aiImageTarget === "featured") {
+      // Use as featured image
+      setFormData((prev) => ({
+        ...prev,
+        featured_image: media.public_url,
+        featured_image_alt: media.alt_text || prev.featured_image_alt,
+      }));
+    } else {
+      // Insert into content
+      const shortcode = `<MediaImage id="${media.id}" />`;
+      setFormData((prev) => ({
+        ...prev,
+        content: prev.content ? `${prev.content}\n\n${shortcode}` : shortcode,
+      }));
+    }
+    setShowAIImageModal(false);
+  };
+
+  // Load surveys on mount
+  useEffect(() => {
+    async function loadSurveys() {
+      try {
+        const response = await fetch("/api/admin/surveys?status=active");
+        if (response.ok) {
+          const data = await response.json();
+          setSurveys(data.surveys || []);
+        }
+      } catch (error) {
+        console.error("Failed to load surveys:", error);
+      }
+    }
+    loadSurveys();
+  }, []);
 
   // Auto-generate slug from title
   useEffect(() => {
@@ -260,6 +370,8 @@ export function PostForm({ post, categories, tags, authorId }: PostFormProps) {
         : [],
       tags: selectedTags,
       faqs: faqs.filter((f) => f.question.trim() && f.answer.trim()),
+      survey_id: selectedSurveyId || null,
+      enquiry_cta_title: enquiryCTATitle || null,
     };
 
     try {
@@ -358,9 +470,21 @@ export function PostForm({ post, categories, tags, authorId }: PostFormProps) {
           {/* Basic Info */}
           <div className="bg-background rounded-lg border border-border p-4 space-y-4">
             <div>
-              <label htmlFor="title" className="block text-sm font-medium mb-1.5">
-                Title <span className="text-destructive">*</span>
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label htmlFor="title" className="block text-sm font-medium">
+                  Title <span className="text-destructive">*</span>
+                </label>
+                <SuggestableField
+                  fieldName="title"
+                  currentValue={formData.title}
+                  blogTitle={formData.title}
+                  blogContent={formData.content}
+                  onSuggestionSelect={(value) =>
+                    setFormData((prev) => ({ ...prev, title: value }))
+                  }
+                  disabled={isLoading}
+                />
+              </div>
               <input
                 id="title"
                 name="title"
@@ -396,9 +520,21 @@ export function PostForm({ post, categories, tags, authorId }: PostFormProps) {
             </div>
 
             <div>
-              <label htmlFor="subtitle" className="block text-sm font-medium mb-1.5">
-                Subtitle
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label htmlFor="subtitle" className="block text-sm font-medium">
+                  Subtitle
+                </label>
+                <SuggestableField
+                  fieldName="subtitle"
+                  currentValue={formData.subtitle}
+                  blogTitle={formData.title}
+                  blogContent={formData.content}
+                  onSuggestionSelect={(value) =>
+                    setFormData((prev) => ({ ...prev, subtitle: value }))
+                  }
+                  disabled={isLoading}
+                />
+              </div>
               <input
                 id="subtitle"
                 name="subtitle"
@@ -414,9 +550,21 @@ export function PostForm({ post, categories, tags, authorId }: PostFormProps) {
             </div>
 
             <div>
-              <label htmlFor="excerpt" className="block text-sm font-medium mb-1.5">
-                Excerpt
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label htmlFor="excerpt" className="block text-sm font-medium">
+                  Excerpt
+                </label>
+                <SuggestableField
+                  fieldName="excerpt"
+                  currentValue={formData.excerpt}
+                  blogTitle={formData.title}
+                  blogContent={formData.content}
+                  onSuggestionSelect={(value) =>
+                    setFormData((prev) => ({ ...prev, excerpt: value }))
+                  }
+                  disabled={isLoading}
+                />
+              </div>
               <textarea
                 id="excerpt"
                 name="excerpt"
@@ -434,9 +582,86 @@ export function PostForm({ post, categories, tags, authorId }: PostFormProps) {
 
           {/* Content */}
           <div className="bg-background rounded-lg border border-border p-4">
-            <label className="block text-sm font-medium mb-1.5">
-              Content <span className="text-destructive">*</span>
-            </label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-sm font-medium">
+                Content <span className="text-destructive">*</span>
+              </label>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowMediaPicker(true)}
+                >
+                  <Image className="h-4 w-4 mr-2" />
+                  Media
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setAIImageTarget("content");
+                    setShowAIImageModal(true);
+                  }}
+                >
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  AI Image
+                </Button>
+              <div className="relative">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".md,.markdown,.txt"
+                  onChange={handleImportMarkdown}
+                  className="hidden"
+                  aria-label="Import markdown file"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowImportMenu(!showImportMenu)}
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Import
+                  <ChevronDown className="h-4 w-4 ml-1" />
+                </Button>
+                {showImportMenu && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-10"
+                      onClick={() => setShowImportMenu(false)}
+                    />
+                    <div className="absolute right-0 mt-1 w-48 bg-background border border-border rounded-md shadow-lg z-20">
+                      <button
+                        type="button"
+                        className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted text-left"
+                        onClick={() => {
+                          fileInputRef.current?.click();
+                          setShowImportMenu(false);
+                        }}
+                      >
+                        <FileText className="h-4 w-4" />
+                        From File
+                      </button>
+                      <button
+                        type="button"
+                        className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted text-left"
+                        onClick={() => {
+                          setShowImportDialog(true);
+                          setShowImportMenu(false);
+                        }}
+                      >
+                        <ClipboardPaste className="h-4 w-4" />
+                        Paste Inline
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+              </div>
+            </div>
             <MarkdownEditor
               value={formData.content}
               onChange={(value) => setFormData((prev) => ({ ...prev, content: value }))}
@@ -448,9 +673,34 @@ export function PostForm({ post, categories, tags, authorId }: PostFormProps) {
           <div className="bg-background rounded-lg border border-border p-4 space-y-4">
             <h3 className="font-medium">Media</h3>
             <div>
-              <label htmlFor="featured_image" className="block text-sm font-medium mb-1.5">
-                Featured Image URL
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label htmlFor="featured_image" className="block text-sm font-medium">
+                  Featured Image URL
+                </label>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setAIImageTarget("featured");
+                      setShowAIImageModal(true);
+                    }}
+                  >
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Generate
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowFeaturedImagePicker(true)}
+                  >
+                    <Image className="h-4 w-4 mr-2" />
+                    Select from Library
+                  </Button>
+                </div>
+              </div>
               <input
                 id="featured_image"
                 name="featured_image"
@@ -526,9 +776,21 @@ export function PostForm({ post, categories, tags, authorId }: PostFormProps) {
             {showSeoSection && (
               <div className="p-4 pt-0 space-y-4">
                 <div>
-                  <label htmlFor="meta_title" className="block text-sm font-medium mb-1.5">
-                    Meta Title
-                  </label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label htmlFor="meta_title" className="block text-sm font-medium">
+                      Meta Title
+                    </label>
+                    <SuggestableField
+                      fieldName="meta_title"
+                      currentValue={formData.meta_title}
+                      blogTitle={formData.title}
+                      blogContent={formData.content}
+                      onSuggestionSelect={(value) =>
+                        setFormData((prev) => ({ ...prev, meta_title: value }))
+                      }
+                      disabled={isLoading}
+                    />
+                  </div>
                   <input
                     id="meta_title"
                     name="meta_title"
@@ -547,9 +809,21 @@ export function PostForm({ post, categories, tags, authorId }: PostFormProps) {
                   </p>
                 </div>
                 <div>
-                  <label htmlFor="meta_description" className="block text-sm font-medium mb-1.5">
-                    Meta Description
-                  </label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label htmlFor="meta_description" className="block text-sm font-medium">
+                      Meta Description
+                    </label>
+                    <SuggestableField
+                      fieldName="meta_description"
+                      currentValue={formData.meta_description}
+                      blogTitle={formData.title}
+                      blogContent={formData.content}
+                      onSuggestionSelect={(value) =>
+                        setFormData((prev) => ({ ...prev, meta_description: value }))
+                      }
+                      disabled={isLoading}
+                    />
+                  </div>
                   <textarea
                     id="meta_description"
                     name="meta_description"
@@ -568,9 +842,21 @@ export function PostForm({ post, categories, tags, authorId }: PostFormProps) {
                   </p>
                 </div>
                 <div>
-                  <label htmlFor="primary_keyword" className="block text-sm font-medium mb-1.5">
-                    Primary Keyword
-                  </label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label htmlFor="primary_keyword" className="block text-sm font-medium">
+                      Primary Keyword
+                    </label>
+                    <SuggestableField
+                      fieldName="primary_keyword"
+                      currentValue={formData.primary_keyword}
+                      blogTitle={formData.title}
+                      blogContent={formData.content}
+                      onSuggestionSelect={(value) =>
+                        setFormData((prev) => ({ ...prev, primary_keyword: value }))
+                      }
+                      disabled={isLoading}
+                    />
+                  </div>
                   <input
                     id="primary_keyword"
                     name="primary_keyword"
@@ -585,9 +871,21 @@ export function PostForm({ post, categories, tags, authorId }: PostFormProps) {
                   />
                 </div>
                 <div>
-                  <label htmlFor="secondary_keywords" className="block text-sm font-medium mb-1.5">
-                    Secondary Keywords
-                  </label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label htmlFor="secondary_keywords" className="block text-sm font-medium">
+                      Secondary Keywords
+                    </label>
+                    <SuggestableField
+                      fieldName="secondary_keywords"
+                      currentValue={formData.secondary_keywords}
+                      blogTitle={formData.title}
+                      blogContent={formData.content}
+                      onSuggestionSelect={(value) =>
+                        setFormData((prev) => ({ ...prev, secondary_keywords: value }))
+                      }
+                      disabled={isLoading}
+                    />
+                  </div>
                   <input
                     id="secondary_keywords"
                     name="secondary_keywords"
@@ -622,9 +920,21 @@ export function PostForm({ post, categories, tags, authorId }: PostFormProps) {
             {showAiSection && (
               <div className="p-4 pt-0 space-y-4">
                 <div>
-                  <label htmlFor="ai_summary" className="block text-sm font-medium mb-1.5">
-                    AI Summary
-                  </label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label htmlFor="ai_summary" className="block text-sm font-medium">
+                      AI Summary
+                    </label>
+                    <SuggestableField
+                      fieldName="ai_summary"
+                      currentValue={formData.ai_summary}
+                      blogTitle={formData.title}
+                      blogContent={formData.content}
+                      onSuggestionSelect={(value) =>
+                        setFormData((prev) => ({ ...prev, ai_summary: value }))
+                      }
+                      disabled={isLoading}
+                    />
+                  </div>
                   <textarea
                     id="ai_summary"
                     name="ai_summary"
@@ -639,9 +949,21 @@ export function PostForm({ post, categories, tags, authorId }: PostFormProps) {
                   />
                 </div>
                 <div>
-                  <label htmlFor="key_takeaways" className="block text-sm font-medium mb-1.5">
-                    Key Takeaways (one per line)
-                  </label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label htmlFor="key_takeaways" className="block text-sm font-medium">
+                      Key Takeaways (one per line)
+                    </label>
+                    <SuggestableField
+                      fieldName="key_takeaways"
+                      currentValue={formData.key_takeaways}
+                      blogTitle={formData.title}
+                      blogContent={formData.content}
+                      onSuggestionSelect={(value) =>
+                        setFormData((prev) => ({ ...prev, key_takeaways: value }))
+                      }
+                      disabled={isLoading}
+                    />
+                  </div>
                   <textarea
                     id="key_takeaways"
                     name="key_takeaways"
@@ -656,9 +978,21 @@ export function PostForm({ post, categories, tags, authorId }: PostFormProps) {
                   />
                 </div>
                 <div>
-                  <label htmlFor="questions_answered" className="block text-sm font-medium mb-1.5">
-                    Questions Answered (one per line)
-                  </label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label htmlFor="questions_answered" className="block text-sm font-medium">
+                      Questions Answered (one per line)
+                    </label>
+                    <SuggestableField
+                      fieldName="questions_answered"
+                      currentValue={formData.questions_answered}
+                      blogTitle={formData.title}
+                      blogContent={formData.content}
+                      onSuggestionSelect={(value) =>
+                        setFormData((prev) => ({ ...prev, questions_answered: value }))
+                      }
+                      disabled={isLoading}
+                    />
+                  </div>
                   <textarea
                     id="questions_answered"
                     name="questions_answered"
@@ -673,9 +1007,21 @@ export function PostForm({ post, categories, tags, authorId }: PostFormProps) {
                   />
                 </div>
                 <div>
-                  <label htmlFor="definitive_statements" className="block text-sm font-medium mb-1.5">
-                    Definitive Statements (one per line)
-                  </label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label htmlFor="definitive_statements" className="block text-sm font-medium">
+                      Definitive Statements (one per line)
+                    </label>
+                    <SuggestableField
+                      fieldName="definitive_statements"
+                      currentValue={formData.definitive_statements}
+                      blogTitle={formData.title}
+                      blogContent={formData.content}
+                      onSuggestionSelect={(value) =>
+                        setFormData((prev) => ({ ...prev, definitive_statements: value }))
+                      }
+                      disabled={isLoading}
+                    />
+                  </div>
                   <textarea
                     id="definitive_statements"
                     name="definitive_statements"
@@ -719,6 +1065,7 @@ export function PostForm({ post, categories, tags, authorId }: PostFormProps) {
                         type="button"
                         onClick={() => handleRemoveFaq(index)}
                         className="text-destructive hover:text-destructive/80"
+                        aria-label={`Remove FAQ #${index + 1}`}
                       >
                         <X className="h-4 w-4" />
                       </button>
@@ -920,6 +1267,57 @@ export function PostForm({ post, categories, tags, authorId }: PostFormProps) {
               )}
             </div>
           </div>
+
+          {/* Enquiry Settings */}
+          <div className="bg-background rounded-lg border border-border p-4 space-y-4">
+            <h3 className="font-medium">Enquiry Settings</h3>
+            <div>
+              <label htmlFor="survey_id" className="block text-sm font-medium mb-1.5">
+                Enquiry Survey
+              </label>
+              <select
+                id="survey_id"
+                value={selectedSurveyId}
+                onChange={(e) => setSelectedSurveyId(e.target.value)}
+                className={cn(
+                  "w-full px-3 py-2 rounded-md border border-input bg-background",
+                  "focus:outline-none focus:ring-2 focus:ring-ring"
+                )}
+              >
+                <option value="">No enquiry form</option>
+                {surveys.map((survey) => (
+                  <option key={survey.id} value={survey.id}>
+                    {survey.name}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-muted-foreground mt-1">
+                Select a survey to show as the enquiry CTA on this post
+              </p>
+            </div>
+
+            {selectedSurveyId && (
+              <div>
+                <label htmlFor="enquiry_cta_title" className="block text-sm font-medium mb-1.5">
+                  CTA Title
+                </label>
+                <input
+                  id="enquiry_cta_title"
+                  type="text"
+                  value={enquiryCTATitle}
+                  onChange={(e) => setEnquiryCTATitle(e.target.value)}
+                  className={cn(
+                    "w-full px-3 py-2 rounded-md border border-input bg-background",
+                    "focus:outline-none focus:ring-2 focus:ring-ring"
+                  )}
+                  placeholder="Get a Free Quote"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  The title shown on the enquiry button
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -945,6 +1343,98 @@ export function PostForm({ post, categories, tags, authorId }: PostFormProps) {
           onApply={handleApplyAIContent}
         />
       )}
+
+      {/* Import Markdown Dialog */}
+      {showImportDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="fixed inset-0 bg-black/50"
+            onClick={() => {
+              setShowImportDialog(false);
+              setImportContent("");
+            }}
+          />
+          <div className="relative bg-background border border-border rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[80vh] flex flex-col">
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <h2 className="text-lg font-semibold">Import Markdown</h2>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowImportDialog(false);
+                  setImportContent("");
+                }}
+                className="text-muted-foreground hover:text-foreground"
+                aria-label="Close dialog"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="p-4 flex-1 overflow-auto">
+              <p className="text-sm text-muted-foreground mb-3">
+                Paste or type your markdown content below. This will replace the current content.
+              </p>
+              <textarea
+                value={importContent}
+                onChange={(e) => setImportContent(e.target.value)}
+                className={cn(
+                  "w-full h-80 px-3 py-2 rounded-md border border-input bg-background font-mono text-sm",
+                  "focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+                )}
+                placeholder="# Your Markdown Here&#10;&#10;Paste or type your markdown content..."
+                autoFocus
+              />
+            </div>
+            <div className="flex justify-end gap-2 p-4 border-t border-border">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setShowImportDialog(false);
+                  setImportContent("");
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={handleApplyInlineImport}
+                disabled={!importContent.trim()}
+              >
+                <ClipboardPaste className="h-4 w-4 mr-2" />
+                Import Content
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Media Picker Modal - for inserting into content */}
+      <MediaPickerModal
+        isOpen={showMediaPicker}
+        onClose={() => setShowMediaPicker(false)}
+        onSelect={handleInsertMedia}
+        multiple
+        title="Insert Media"
+      />
+
+      {/* Featured Image Picker Modal */}
+      <MediaPickerModal
+        isOpen={showFeaturedImagePicker}
+        onClose={() => setShowFeaturedImagePicker(false)}
+        onSelect={handleSelectFeaturedImage}
+        allowedTypes={["image"]}
+        title="Select Featured Image"
+      />
+
+      {/* AI Image Generation Modal */}
+      <AIImageModal
+        isOpen={showAIImageModal}
+        onClose={() => setShowAIImageModal(false)}
+        onImageSaved={handleAIImageSaved}
+        initialPrompt={formData.title ? `Illustration for: ${formData.title}` : ""}
+        defaultType={aiImageTarget === "featured" ? "og" : "hero"}
+        context="post-editor"
+      />
     </div>
   );
 }
