@@ -71,10 +71,10 @@ export function MediaEditModal({
   const handleCopyShortcode = async () => {
     const tagName =
       media.file_type === "image"
-        ? "MediaImage"
+        ? "mediaimage"
         : media.file_type === "video"
-        ? "MediaVideo"
-        : "MediaAudio";
+        ? "mediavideo"
+        : "mediaaudio";
     const shortcode = `<${tagName} id="${media.id}" />`;
     await navigator.clipboard.writeText(shortcode);
     setCopiedShortcode(true);

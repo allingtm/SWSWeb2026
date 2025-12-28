@@ -45,8 +45,8 @@ export function MediaCard({
   };
 
   const handleCopyShortcode = async () => {
-    const tagName = media.file_type === "image" ? "MediaImage" :
-                    media.file_type === "video" ? "MediaVideo" : "MediaAudio";
+    const tagName = media.file_type === "image" ? "mediaimage" :
+                    media.file_type === "video" ? "mediavideo" : "mediaaudio";
     const shortcode = `<${tagName} id="${media.id}" />`;
     await navigator.clipboard.writeText(shortcode);
   };
