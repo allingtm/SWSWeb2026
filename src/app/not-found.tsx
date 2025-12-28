@@ -20,14 +20,14 @@ export default function NotFound() {
       {floatingSymbols.map((item, index) => (
         <div
           key={index}
-          className="absolute text-4xl md:text-6xl font-mono text-muted-foreground/20 select-none pointer-events-none"
+          className="absolute text-4xl md:text-6xl font-mono text-muted-foreground/20 select-none pointer-events-none animate-float"
           style={{
             top: item.top,
             left: item.left,
             right: item.right,
-            animation: `float ${item.duration} ease-in-out infinite`,
-            animationDelay: item.delay,
-          }}
+            "--float-duration": item.duration,
+            "--float-delay": item.delay,
+          } as React.CSSProperties}
         >
           {item.symbol}
         </div>
@@ -36,12 +36,7 @@ export default function NotFound() {
       {/* Main content */}
       <div className="relative z-10 text-center px-4">
         {/* 404 with gradient */}
-        <h1
-          className="text-[8rem] md:text-[12rem] font-bold leading-none text-gradient"
-          style={{
-            animation: "pulse-glow 3s ease-in-out infinite",
-          }}
-        >
+        <h1 className="text-[8rem] md:text-[12rem] font-bold leading-none text-gradient animate-pulse-glow">
           404
         </h1>
 
@@ -65,31 +60,6 @@ export default function NotFound() {
           </Button>
         </div>
       </div>
-
-      {/* Inline styles for animations */}
-      <style jsx>{`
-        @keyframes float {
-          0%,
-          100% {
-            transform: translateY(0px) rotate(0deg);
-            opacity: 0.2;
-          }
-          50% {
-            transform: translateY(-20px) rotate(5deg);
-            opacity: 0.4;
-          }
-        }
-
-        @keyframes pulse-glow {
-          0%,
-          100% {
-            filter: drop-shadow(0 0 20px rgba(37, 99, 235, 0.3));
-          }
-          50% {
-            filter: drop-shadow(0 0 40px rgba(37, 99, 235, 0.5));
-          }
-        }
-      `}</style>
     </div>
   );
 }
