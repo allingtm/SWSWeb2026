@@ -34,13 +34,18 @@ export function PostCard({ post, featured = false }: PostCardProps) {
 
             {/* Category badge on image */}
             <div className="absolute bottom-3 left-3">
-              <Badge
-                variant="secondary"
-                className="bg-background/90 backdrop-blur-sm"
-                style={{ borderColor: post.category.color || undefined }}
+              <Link
+                href={`/${post.category.slug}`}
+                onClick={(e) => e.stopPropagation()}
               >
-                {post.category.name}
-              </Badge>
+                <Badge
+                  variant="secondary"
+                  className="bg-background/90 backdrop-blur-sm hover:bg-background transition-colors"
+                  style={{ borderColor: post.category.color || undefined }}
+                >
+                  {post.category.name}
+                </Badge>
+              </Link>
             </div>
           </div>
         )}
@@ -49,13 +54,18 @@ export function PostCard({ post, featured = false }: PostCardProps) {
         <div className="p-4">
           {/* If no image, show category here */}
           {!post.featured_image && (
-            <Badge
-              variant="outline"
-              className="mb-2"
-              style={{ borderColor: post.category.color || undefined }}
+            <Link
+              href={`/${post.category.slug}`}
+              onClick={(e) => e.stopPropagation()}
             >
-              {post.category.name}
-            </Badge>
+              <Badge
+                variant="outline"
+                className="mb-2 hover:bg-accent transition-colors"
+                style={{ borderColor: post.category.color || undefined }}
+              >
+                {post.category.name}
+              </Badge>
+            </Link>
           )}
 
           <h3
