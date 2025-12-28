@@ -6,12 +6,12 @@
 // Primary: #2563eb (blue-600)
 export const lightTheme = {
   cssVariables: {
-    // Background colors - transparent to match modal background
-    "--sjs-general-backcolor": "transparent",
-    "--sjs-general-backcolor-dark": "transparent",
-    "--sjs-general-backcolor-dim": "transparent",
-    "--sjs-general-backcolor-dim-light": "transparent",
-    "--sjs-general-backcolor-dim-dark": "transparent",
+    // Background colors - white for dropdown popups, dim variants for form container
+    "--sjs-general-backcolor": "rgba(255, 255, 255, 1)",
+    "--sjs-general-backcolor-dark": "rgba(243, 244, 246, 1)",
+    "--sjs-general-backcolor-dim": "rgba(255, 255, 255, 1)",
+    "--sjs-general-backcolor-dim-light": "rgba(255, 255, 255, 1)",
+    "--sjs-general-backcolor-dim-dark": "rgba(243, 244, 246, 1)",
     // Editor/Input backgrounds - gray-100 for better contrast against white modal
     "--sjs-editor-background": "rgba(243, 244, 246, 1)",
     "--sjs-editorpanel-backcolor": "rgba(243, 244, 246, 1)",
@@ -69,12 +69,12 @@ export const lightTheme = {
 // Background should match modal bg-background which is neutral-900 (#171717)
 export const darkTheme = {
   cssVariables: {
-    // Background colors - all transparent/same to match modal background
-    "--sjs-general-backcolor": "transparent",
-    "--sjs-general-backcolor-dark": "transparent",
-    "--sjs-general-backcolor-dim": "transparent",
-    "--sjs-general-backcolor-dim-light": "transparent",
-    "--sjs-general-backcolor-dim-dark": "transparent",
+    // Background colors - solid for dropdown popups
+    "--sjs-general-backcolor": "rgba(23, 23, 23, 1)",
+    "--sjs-general-backcolor-dark": "rgba(38, 38, 38, 1)",
+    "--sjs-general-backcolor-dim": "rgba(23, 23, 23, 1)",
+    "--sjs-general-backcolor-dim-light": "rgba(23, 23, 23, 1)",
+    "--sjs-general-backcolor-dim-dark": "rgba(38, 38, 38, 1)",
     // Editor/Input backgrounds - slightly lighter for visibility against modal bg
     "--sjs-editor-background": "rgba(38, 38, 38, 1)",
     "--sjs-editorpanel-backcolor": "rgba(38, 38, 38, 1)",
