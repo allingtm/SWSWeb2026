@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Plus, Edit, Trash2, Eye, EyeOff, Home } from "lucide-react";
 import { getAllCategories } from "@/lib/supabase/queries/admin";
-import { Button } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button-link";
 
 export default async function CategoriesPage() {
   const categories = await getAllCategories();
@@ -10,21 +10,19 @@ export default async function CategoriesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-foreground">Categories</h1>
-        <Button asChild>
-          <Link href="/admin/categories/new">
-            <Plus className="h-4 w-4 mr-2" />
-            New Category
-          </Link>
-        </Button>
+        <ButtonLink href="/admin/categories/new">
+          <Plus className="h-4 w-4 mr-2" />
+          New Category
+        </ButtonLink>
       </div>
 
       <div className="bg-background rounded-lg border border-border overflow-hidden">
         {categories.length === 0 ? (
           <div className="p-8 text-center text-muted-foreground">
             <p>No categories yet</p>
-            <Button variant="link" asChild className="mt-2">
-              <Link href="/admin/categories/new">Create your first category</Link>
-            </Button>
+            <ButtonLink href="/admin/categories/new" variant="link" className="mt-2">
+              Create your first category
+            </ButtonLink>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -100,18 +98,14 @@ export default async function CategoriesPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-1">
-                        <Button variant="ghost" size="icon" asChild>
-                          <Link href={`/${category.slug}`} target="_blank">
-                            <Eye className="h-4 w-4" />
-                            <span className="sr-only">View</span>
-                          </Link>
-                        </Button>
-                        <Button variant="ghost" size="icon" asChild>
-                          <Link href={`/admin/categories/${category.id}`}>
-                            <Edit className="h-4 w-4" />
-                            <span className="sr-only">Edit</span>
-                          </Link>
-                        </Button>
+                        <ButtonLink href={`/${category.slug}`} variant="ghost" size="icon" external>
+                          <Eye className="h-4 w-4" />
+                          <span className="sr-only">View</span>
+                        </ButtonLink>
+                        <ButtonLink href={`/admin/categories/${category.id}`} variant="ghost" size="icon">
+                          <Edit className="h-4 w-4" />
+                          <span className="sr-only">Edit</span>
+                        </ButtonLink>
                       </div>
                     </td>
                   </tr>

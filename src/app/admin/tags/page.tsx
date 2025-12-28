@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Plus, Edit, Eye } from "lucide-react";
 import { getAllTags } from "@/lib/supabase/queries/admin";
-import { Button } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button-link";
 
 export default async function TagsPage() {
   const tags = await getAllTags();
@@ -10,21 +10,19 @@ export default async function TagsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-foreground">Tags</h1>
-        <Button asChild>
-          <Link href="/admin/tags/new">
-            <Plus className="h-4 w-4 mr-2" />
-            New Tag
-          </Link>
-        </Button>
+        <ButtonLink href="/admin/tags/new">
+          <Plus className="h-4 w-4 mr-2" />
+          New Tag
+        </ButtonLink>
       </div>
 
       <div className="bg-background rounded-lg border border-border overflow-hidden">
         {tags.length === 0 ? (
           <div className="p-8 text-center text-muted-foreground">
             <p>No tags yet</p>
-            <Button variant="link" asChild className="mt-2">
-              <Link href="/admin/tags/new">Create your first tag</Link>
-            </Button>
+            <ButtonLink href="/admin/tags/new" variant="link" className="mt-2">
+              Create your first tag
+            </ButtonLink>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -67,18 +65,14 @@ export default async function TagsPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-1">
-                        <Button variant="ghost" size="icon" asChild>
-                          <Link href={`/tag/${tag.slug}`} target="_blank">
-                            <Eye className="h-4 w-4" />
-                            <span className="sr-only">View</span>
-                          </Link>
-                        </Button>
-                        <Button variant="ghost" size="icon" asChild>
-                          <Link href={`/admin/tags/${tag.id}`}>
-                            <Edit className="h-4 w-4" />
-                            <span className="sr-only">Edit</span>
-                          </Link>
-                        </Button>
+                        <ButtonLink href={`/tag/${tag.slug}`} variant="ghost" size="icon" external>
+                          <Eye className="h-4 w-4" />
+                          <span className="sr-only">View</span>
+                        </ButtonLink>
+                        <ButtonLink href={`/admin/tags/${tag.id}`} variant="ghost" size="icon">
+                          <Edit className="h-4 w-4" />
+                          <span className="sr-only">Edit</span>
+                        </ButtonLink>
                       </div>
                     </td>
                   </tr>

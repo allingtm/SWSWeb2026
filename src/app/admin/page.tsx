@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { FileText, FolderOpen, Tags, Plus, Eye } from "lucide-react";
 import { getPostCounts, getRecentPosts, getAllCategories, getAllTags } from "@/lib/supabase/queries/admin";
-import { Button } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button-link";
 import { StatusBadge } from "@/components/admin/status-badge";
 
 export default async function AdminDashboardPage() {
@@ -43,12 +43,10 @@ export default async function AdminDashboardPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-        <Button asChild>
-          <Link href="/admin/posts/new">
-            <Plus className="h-4 w-4 mr-2" />
-            New Post
-          </Link>
-        </Button>
+        <ButtonLink href="/admin/posts/new">
+          <Plus className="h-4 w-4 mr-2" />
+          New Post
+        </ButtonLink>
       </div>
 
       {/* Stats Grid */}
@@ -128,18 +126,18 @@ export default async function AdminDashboardPage() {
           <h2 className="text-lg font-semibold text-foreground">
             Recent Posts
           </h2>
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/admin/posts">View all</Link>
-          </Button>
+          <ButtonLink href="/admin/posts" variant="ghost" size="sm">
+            View all
+          </ButtonLink>
         </div>
         <div className="divide-y divide-border">
           {recentPosts.length === 0 ? (
             <div className="p-8 text-center text-muted-foreground">
               <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
               <p>No posts yet</p>
-              <Button variant="link" asChild className="mt-2">
-                <Link href="/admin/posts/new">Create your first post</Link>
-              </Button>
+              <ButtonLink href="/admin/posts/new" variant="link" className="mt-2">
+                Create your first post
+              </ButtonLink>
             </div>
           ) : (
             recentPosts.map((post) => (

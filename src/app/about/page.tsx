@@ -1,9 +1,8 @@
 import { Metadata } from "next";
-import Link from "next/link";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Container } from "@/components/ui/container";
-import { Button } from "@/components/ui/button";
+import { ButtonLink } from "@/components/ui/button-link";
 import { getNavCategories } from "@/lib/supabase/queries";
 import { generateMetadata as generateSiteMetadata } from "@/lib/seo/metadata";
 import { siteConfig } from "@/lib/seo/constants";
@@ -218,14 +217,17 @@ export default async function AboutPage() {
               We would be delighted to learn about your requirements and explore how we can work together.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg">
-                <Link href="/contact">Contact Us</Link>
-              </Button>
-              <Button asChild variant="outline" size="lg">
-                <a href={`tel:${siteConfig.phone.replace(/-/g, "")}`}>
-                  Call {siteConfig.phone}
-                </a>
-              </Button>
+              <ButtonLink href="/contact" size="lg">
+                Contact Us
+              </ButtonLink>
+              <ButtonLink
+                href={`tel:${siteConfig.phone.replace(/-/g, "")}`}
+                variant="outline"
+                size="lg"
+                external
+              >
+                Call {siteConfig.phone}
+              </ButtonLink>
             </div>
           </Container>
         </section>
