@@ -165,7 +165,7 @@ export async function POST(req: NextRequest) {
     const openai = getOpenAI();
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-4o-latest",
       messages: [
         { role: "system", content: buildSystemPrompt(request.fieldConfig) },
         { role: "user", content: buildUserPrompt(request) },

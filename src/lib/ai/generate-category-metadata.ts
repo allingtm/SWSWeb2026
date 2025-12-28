@@ -70,7 +70,7 @@ export async function generateCategoryMetadata(
 ): Promise<AICategoryContent> {
   const openai = getOpenAI();
   const response = await openai.chat.completions.create({
-    model: "gpt-4o",
+    model: "gpt-4o-latest",
     messages: [
       { role: "system", content: SYSTEM_PROMPT },
       { role: "user", content: buildUserPrompt(request) },

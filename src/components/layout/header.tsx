@@ -1,12 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import dynamic from "next/dynamic";
-import { Menu, User, Search } from "lucide-react";
+import { Menu, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "./theme-toggle";
 import type { BlogCategory } from "@/types";
 
 // Lazy-load SearchModal - only loaded when search is triggered
@@ -55,13 +54,6 @@ export function Header({ categories }: HeaderProps) {
             >
               <Search className="h-5 w-5" />
               <span className="sr-only">Search</span>
-            </Button>
-            <ThemeToggle />
-            <Button variant="ghost" size="icon" asChild>
-              <Link href="/login">
-                <User className="h-5 w-5" />
-                <span className="sr-only">Login</span>
-              </Link>
             </Button>
             <button
               type="button"
