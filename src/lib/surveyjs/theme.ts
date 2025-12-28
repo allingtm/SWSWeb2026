@@ -12,9 +12,9 @@ export const lightTheme = {
     "--sjs-general-backcolor-dim": "transparent",
     "--sjs-general-backcolor-dim-light": "transparent",
     "--sjs-general-backcolor-dim-dark": "transparent",
-    // Editor/Input backgrounds - slightly gray for visibility
-    "--sjs-editor-background": "rgba(249, 250, 251, 1)",
-    "--sjs-editorpanel-backcolor": "rgba(249, 250, 251, 1)",
+    // Editor/Input backgrounds - gray-100 for better contrast against white modal
+    "--sjs-editor-background": "rgba(243, 244, 246, 1)",
+    "--sjs-editorpanel-backcolor": "rgba(243, 244, 246, 1)",
     "--sjs-questionpanel-backcolor": "transparent",
     // Foreground colors - dark text
     "--sjs-general-forecolor": "rgba(10, 10, 10, 0.91)",
