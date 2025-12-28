@@ -2,6 +2,18 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function proxy(request: NextRequest) {
+  const { pathname, searchParams } = request.nextUrl;
+
+  // Handle Supabase auth code exchange
+  // If we have a 'code' parameter on the root path, redirect to auth callback
+  if (pathname === "/" && searchParams.has("code")) {
+    const code = searchParams.get("code");
+    const url = request.nextUrl.clone();
+    url.pathname = "/auth/callback";
+    url.searchParams.set("code", code!);
+    return NextResponse.redirect(url);
+  }
+
   let response = NextResponse.next({
     request: { headers: request.headers },
   });
@@ -53,5 +65,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/login"],
+  matcher: ["/", "/admin/:path*", "/login"],
 };
