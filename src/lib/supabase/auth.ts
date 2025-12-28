@@ -75,3 +75,23 @@ export async function getAuthorByUserId(
 
   return author as BlogAuthor | null;
 }
+
+export async function resetPasswordForEmail(email: string, redirectTo: string) {
+  const supabase = await createClient();
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo,
+  });
+
+  return { error: error?.message || null };
+}
+
+export async function updatePassword(newPassword: string) {
+  const supabase = await createClient();
+
+  const { error } = await supabase.auth.updateUser({
+    password: newPassword,
+  });
+
+  return { error: error?.message || null };
+}
