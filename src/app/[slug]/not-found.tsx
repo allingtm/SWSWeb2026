@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
-import { Button } from "@/components/ui/button";
 
 export default function NotFound() {
   return (
@@ -10,12 +9,18 @@ export default function NotFound() {
         The page you&apos;re looking for doesn&apos;t exist or has been moved.
       </p>
       <div className="flex gap-4">
-        <Button asChild>
-          <Link href="/">Go Home</Link>
-        </Button>
-        <Button variant="outline" asChild>
-          <Link href="/contact">Contact Us</Link>
-        </Button>
+        <Link
+          href="/"
+          className="inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:bg-primary/90 transition-colors"
+        >
+          Go Home
+        </Link>
+        <Link
+          href="/contact"
+          className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+        >
+          Contact Us
+        </Link>
       </div>
     </Container>
   );
