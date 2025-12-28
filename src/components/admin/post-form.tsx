@@ -160,7 +160,7 @@ export function PostForm({ post, categories, tags, authorId }: PostFormProps) {
           : item.file_type === "video"
           ? "mediavideo"
           : "mediaaudio";
-      return `<${tagName} id="${item.id}" />`;
+      return `<${tagName} id="${item.id}"></${tagName}>`;
     });
     const insertText = shortcodes.join("\n\n");
 
@@ -194,7 +194,7 @@ export function PostForm({ post, categories, tags, authorId }: PostFormProps) {
       }));
     } else {
       // Insert into content
-      const shortcode = `<mediaimage id="${media.id}" />`;
+      const shortcode = `<mediaimage id="${media.id}"></mediaimage>`;
       setFormData((prev) => ({
         ...prev,
         content: prev.content ? `${prev.content}\n\n${shortcode}` : shortcode,

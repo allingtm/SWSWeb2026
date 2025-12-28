@@ -75,7 +75,7 @@ export function MediaEditModal({
         : media.file_type === "video"
         ? "mediavideo"
         : "mediaaudio";
-    const shortcode = `<${tagName} id="${media.id}" />`;
+    const shortcode = `<${tagName} id="${media.id}"></${tagName}>`;
     await navigator.clipboard.writeText(shortcode);
     setCopiedShortcode(true);
     setTimeout(() => setCopiedShortcode(false), 2000);
