@@ -283,3 +283,56 @@ body {
 .dark .prose {
   color: var(--foreground);
 }
+
+/* Table styles for prose content */
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.875rem;
+}
+
+.prose thead {
+  background: var(--muted);
+  border-bottom: 2px solid var(--border);
+}
+
+.prose th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.prose td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--foreground);
+  vertical-align: top;
+}
+
+.prose tbody tr:hover {
+  background: var(--muted);
+  transition: background-color 0.15s ease;
+}
+
+/* Alternating row colors */
+.prose tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--muted) 50%, transparent);
+}
+
+.prose tbody tr:nth-child(even):hover {
+  background: var(--muted);
+}
+
+/* Mobile table optimizations */
+@media (max-width: 768px) {
+  .prose table {
+    font-size: 0.8125rem;
+  }
+
+  .prose th,
+  .prose td {
+    padding: 0.5rem 0.75rem;
+  }
+}

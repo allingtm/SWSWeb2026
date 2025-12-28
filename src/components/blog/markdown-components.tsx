@@ -2,6 +2,7 @@
 
 import type { Components } from "react-markdown";
 import { MediaImage, MediaGallery, MediaVideo, MediaAudio } from "./media";
+import { markdownTableComponents } from "./markdown-table-components";
 
 // Custom component wrapper types
 interface MediaImageComponentProps {
@@ -101,4 +102,6 @@ export const markdownMediaComponents = {
   mediagallery: MediaGalleryWrapper,
   mediavideo: MediaVideoWrapper,
   mediaaudio: MediaAudioWrapper,
+  // Table components for responsive tables
+  ...markdownTableComponents,
 } as Partial<Components>;
