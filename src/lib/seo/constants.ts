@@ -6,7 +6,7 @@ export const siteConfig = {
   description:
     "Expert insights on software development, AI, automation, and digital transformation. Practical advice for businesses navigating technology decisions.",
   url: "https://solvewithsoftware.com",
-  ogImage: "https://solvewithsoftware.com/images/og/default.jpg",
+  ogImage: "https://solvewithsoftware.com/bespoke-web-mobile-and-ai-applications.png",
   twitterHandle: "@solvewithsw",
   email: "hello@solvewithsoftware.com",
   phone: "01206-848428",
