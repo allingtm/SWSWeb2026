@@ -3,6 +3,7 @@
 import type { Components } from "react-markdown";
 import { MediaImage, MediaGallery, MediaVideo, MediaAudio } from "./media";
 import { markdownTableComponents } from "./markdown-table-components";
+import { CalendlyShortcode } from "./calendly-trigger";
 
 // Custom component wrapper types
 interface MediaImageComponentProps {
@@ -31,6 +32,14 @@ interface MediaVideoComponentProps {
 interface MediaAudioComponentProps {
   id?: string;
   showwaveform?: string;
+  className?: string;
+}
+
+interface CalendlyComponentProps {
+  title?: string;
+  description?: string;
+  variant?: string;
+  size?: string;
   className?: string;
 }
 
@@ -88,6 +97,19 @@ function MediaAudioWrapper({ id, className }: MediaAudioComponentProps) {
   return <MediaAudio id={id} className={className} />;
 }
 
+// Component wrapper for Calendly booking trigger
+function CalendlyWrapper({ title, description, variant, size, className }: CalendlyComponentProps) {
+  return (
+    <CalendlyShortcode
+      title={title}
+      description={description}
+      variant={variant}
+      size={size}
+      className={className}
+    />
+  );
+}
+
 // Components map for ReactMarkdown
 // These match HTML tag names that can be used in markdown
 // Cast to Components since these are custom elements not in the standard HTML spec
@@ -102,6 +124,9 @@ export const markdownMediaComponents = {
   mediagallery: MediaGalleryWrapper,
   mediavideo: MediaVideoWrapper,
   mediaaudio: MediaAudioWrapper,
+  // Calendly booking trigger shortcode
+  Calendly: CalendlyWrapper,
+  calendly: CalendlyWrapper,
   // Table components for responsive tables
   ...markdownTableComponents,
 } as Partial<Components>;

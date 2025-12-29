@@ -16,6 +16,8 @@ import { Badge } from "@/components/ui/badge";
 import { Container } from "@/components/ui/container";
 import { formatDate } from "@/lib/utils";
 import { EnquiryCTAInline } from "./enquiry-cta-inline";
+import { CalendlyProvider } from "./calendly-context";
+import { CalendlyBookingModal } from "./calendly-booking-modal";
 import type { BlogPostWithRelations } from "@/types";
 
 // Lazy-load enquiry components - only loaded when post has enquiry configured
@@ -186,7 +188,19 @@ export function PostContent({ post }: PostContentProps) {
   // Check if post has an enquiry form configured
   const hasEnquiry = post.survey && post.enquiry_cta_title;
 
+  // Calendly config for the provider
+  const calendlyConfig =
+    post.calendly_enabled && post.calendly_event_type_uri
+      ? {
+          eventTypeUri: post.calendly_event_type_uri,
+          postId: post.id,
+          ctaTitle: post.calendly_cta_title || "Schedule a Meeting",
+          ctaDescription: post.calendly_cta_description,
+        }
+      : null;
+
   return (
+    <CalendlyProvider config={calendlyConfig}>
     <article className="py-8">
       {/* Floating CTA - always visible when scrolling */}
       {hasEnquiry && (
@@ -417,6 +431,10 @@ export function PostContent({ post }: PostContentProps) {
           ctaTitle={post.enquiry_cta_title!}
         />
       )}
+
+      {/* Calendly Booking Modal */}
+      <CalendlyBookingModal />
     </article>
+    </CalendlyProvider>
   );
 }

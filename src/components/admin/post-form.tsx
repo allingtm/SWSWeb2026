@@ -12,6 +12,7 @@ import { SuggestableField } from "./suggestable-field";
 import { useAIGeneration } from "@/hooks/use-ai-generation";
 import { MediaPickerModal } from "./media-picker-modal";
 import { AIImageModal } from "./ai-image-modal";
+import { CalendlySettings } from "./calendly-settings";
 import { cn } from "@/lib/utils";
 import type { BlogPostWithRelations, BlogCategory, BlogTag, BlogFaq, MediaItem, Survey } from "@/types";
 import type { AIGeneratedContent } from "@/lib/ai/types";
@@ -114,6 +115,12 @@ export function PostForm({ post, categories, tags, authorId }: PostFormProps) {
   const [surveys, setSurveys] = useState<Survey[]>([]);
   const [selectedSurveyId, setSelectedSurveyId] = useState<string>(post?.survey_id || "");
   const [enquiryCTATitle, setEnquiryCTATitle] = useState(post?.enquiry_cta_title || "");
+
+  // Calendly state
+  const [calendlyEnabled, setCalendlyEnabled] = useState(post?.calendly_enabled || false);
+  const [calendlyEventTypeUri, setCalendlyEventTypeUri] = useState(post?.calendly_event_type_uri || "");
+  const [calendlyCtaTitle, setCalendlyCtaTitle] = useState(post?.calendly_cta_title || "Schedule a Meeting");
+  const [calendlyCtaDescription, setCalendlyCtaDescription] = useState(post?.calendly_cta_description || "");
 
   const { generate, isGenerating, error: aiError } = useAIGeneration({
     onSuccess: (data) => {
@@ -372,6 +379,11 @@ export function PostForm({ post, categories, tags, authorId }: PostFormProps) {
       faqs: faqs.filter((f) => f.question.trim() && f.answer.trim()),
       survey_id: selectedSurveyId || null,
       enquiry_cta_title: enquiryCTATitle || null,
+      // Calendly fields
+      calendly_enabled: calendlyEnabled,
+      calendly_event_type_uri: calendlyEventTypeUri || null,
+      calendly_cta_title: calendlyCtaTitle || null,
+      calendly_cta_description: calendlyCtaDescription || null,
     };
 
     try {
@@ -1318,6 +1330,18 @@ export function PostForm({ post, categories, tags, authorId }: PostFormProps) {
               </div>
             )}
           </div>
+
+          {/* Calendly Settings */}
+          <CalendlySettings
+            enabled={calendlyEnabled}
+            onEnabledChange={setCalendlyEnabled}
+            eventTypeUri={calendlyEventTypeUri}
+            onEventTypeUriChange={setCalendlyEventTypeUri}
+            ctaTitle={calendlyCtaTitle}
+            onCtaTitleChange={setCalendlyCtaTitle}
+            ctaDescription={calendlyCtaDescription}
+            onCtaDescriptionChange={setCalendlyCtaDescription}
+          />
         </div>
       </div>
 

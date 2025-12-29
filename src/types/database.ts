@@ -77,6 +77,11 @@ export interface BlogPost {
   view_count: number;
   survey_id: string | null;
   enquiry_cta_title: string | null;
+  // Calendly fields
+  calendly_enabled: boolean;
+  calendly_event_type_uri: string | null;
+  calendly_cta_title: string | null;
+  calendly_cta_description: string | null;
   created_at: string;
   updated_at: string;
 }
