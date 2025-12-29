@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useTheme } from "next-themes";
 import { X, CheckCircle, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { InlineWidget, useCalendlyEventListener } from "react-calendly";
@@ -8,12 +9,34 @@ import { useCalendly } from "./calendly-context";
 
 export function CalendlyBookingModal() {
   const { config, isModalOpen, closeModal } = useCalendly();
+  const { resolvedTheme } = useTheme();
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Calendly pageSettings for dark/light mode (requires Calendly Pro plan)
+  const pageSettings = {
+    backgroundColor: resolvedTheme === "dark" ? "0a0a0a" : "ffffff",
+    textColor: resolvedTheme === "dark" ? "fafafa" : "0a0a0a",
+    primaryColor: resolvedTheme === "dark" ? "3b82f6" : "2563eb",
+  };
+
+  // Fallback timeout to hide loading state if Calendly events don't fire
+  useEffect(() => {
+    if (!isModalOpen) return;
+
+    const timeout = setTimeout(() => {
+      setIsLoading(false);
+    }, 3000); // Hide loader after 3 seconds max
+
+    return () => clearTimeout(timeout);
+  }, [isModalOpen]);
 
   // Listen for Calendly events
   useCalendlyEventListener({
     onProfilePageViewed: () => {
+      setIsLoading(false);
+    },
+    onDateAndTimeSelected: () => {
       setIsLoading(false);
     },
     onEventScheduled: async (e) => {
@@ -122,6 +145,7 @@ export function CalendlyBookingModal() {
                     height: "100%",
                     minWidth: "100%",
                   }}
+                  pageSettings={pageSettings}
                 />
               )}
             </div>
