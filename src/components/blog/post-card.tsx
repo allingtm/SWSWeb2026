@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
@@ -12,6 +13,14 @@ interface PostCardProps {
 }
 
 export function PostCard({ post, featured = false }: PostCardProps) {
+  const router = useRouter();
+
+  const handleCategoryClick = (e: React.MouseEvent, categorySlug: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    router.push(`/${categorySlug}`);
+  };
+
   return (
     <Link href={`/${post.slug}`} className="group block">
       <article
@@ -36,9 +45,16 @@ export function PostCard({ post, featured = false }: PostCardProps) {
 
             {/* Category badge on image */}
             <div className="absolute bottom-3 left-3">
-              <Link
-                href={`/${post.category.slug}`}
-                onClick={(e) => e.stopPropagation()}
+              <span
+                role="link"
+                tabIndex={0}
+                onClick={(e) => handleCategoryClick(e, post.category.slug)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    handleCategoryClick(e as unknown as React.MouseEvent, post.category.slug);
+                  }
+                }}
+                className="cursor-pointer"
               >
                 <Badge
                   variant="secondary"
@@ -47,7 +63,7 @@ export function PostCard({ post, featured = false }: PostCardProps) {
                 >
                   {post.category.name}
                 </Badge>
-              </Link>
+              </span>
             </div>
           </div>
         )}
@@ -56,9 +72,16 @@ export function PostCard({ post, featured = false }: PostCardProps) {
         <div className="p-4">
           {/* If no image, show category here */}
           {!post.featured_image && (
-            <Link
-              href={`/${post.category.slug}`}
-              onClick={(e) => e.stopPropagation()}
+            <span
+              role="link"
+              tabIndex={0}
+              onClick={(e) => handleCategoryClick(e, post.category.slug)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  handleCategoryClick(e as unknown as React.MouseEvent, post.category.slug);
+                }
+              }}
+              className="cursor-pointer"
             >
               <Badge
                 variant="outline"
@@ -67,7 +90,7 @@ export function PostCard({ post, featured = false }: PostCardProps) {
               >
                 {post.category.name}
               </Badge>
-            </Link>
+            </span>
           )}
 
           <h3

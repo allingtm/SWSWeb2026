@@ -10,6 +10,8 @@ interface CalendlySettingsProps {
   onEnabledChange: (enabled: boolean) => void;
   eventTypeUri: string;
   onEventTypeUriChange: (uri: string) => void;
+  schedulingUrl: string;
+  onSchedulingUrlChange: (url: string) => void;
   ctaTitle: string;
   onCtaTitleChange: (title: string) => void;
   ctaDescription: string;
@@ -21,6 +23,8 @@ export function CalendlySettings({
   onEnabledChange,
   eventTypeUri,
   onEventTypeUriChange,
+  schedulingUrl,
+  onSchedulingUrlChange,
   ctaTitle,
   onCtaTitleChange,
   ctaDescription,
@@ -49,7 +53,18 @@ export function CalendlySettings({
         }
 
         const data = await response.json();
-        setEventTypes(data.eventTypes || []);
+        const fetchedEventTypes = data.eventTypes || [];
+        setEventTypes(fetchedEventTypes);
+
+        // If there's already a selected event type but no scheduling URL, populate it
+        if (eventTypeUri && !schedulingUrl) {
+          const selectedEventType = fetchedEventTypes.find(
+            (et: CalendlyEventType) => et.uri === eventTypeUri
+          );
+          if (selectedEventType?.scheduling_url) {
+            onSchedulingUrlChange(selectedEventType.scheduling_url);
+          }
+        }
       } catch (err) {
         setError("Unable to load Calendly event types");
         console.error(err);
@@ -121,7 +136,13 @@ export function CalendlySettings({
             ) : (
               <select
                 value={eventTypeUri}
-                onChange={(e) => onEventTypeUriChange(e.target.value)}
+                onChange={(e) => {
+                  const selectedUri = e.target.value;
+                  onEventTypeUriChange(selectedUri);
+                  // Also update the scheduling URL from the selected event type
+                  const selectedEventType = eventTypes.find(et => et.uri === selectedUri);
+                  onSchedulingUrlChange(selectedEventType?.scheduling_url || "");
+                }}
                 className={cn(
                   "w-full px-3 py-2 rounded-md border border-input bg-background",
                   "focus:outline-none focus:ring-2 focus:ring-ring"

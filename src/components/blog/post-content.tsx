@@ -190,9 +190,10 @@ export function PostContent({ post }: PostContentProps) {
 
   // Calendly config for the provider
   const calendlyConfig =
-    post.calendly_enabled && post.calendly_event_type_uri
+    post.calendly_enabled && post.calendly_scheduling_url && post.calendly_event_type_uri
       ? {
           eventTypeUri: post.calendly_event_type_uri,
+          schedulingUrl: post.calendly_scheduling_url,
           postId: post.id,
           ctaTitle: post.calendly_cta_title || "Schedule a Meeting",
           ctaDescription: post.calendly_cta_description,

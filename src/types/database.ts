@@ -80,6 +80,7 @@ export interface BlogPost {
   // Calendly fields
   calendly_enabled: boolean;
   calendly_event_type_uri: string | null;
+  calendly_scheduling_url: string | null;
   calendly_cta_title: string | null;
   calendly_cta_description: string | null;
   created_at: string;

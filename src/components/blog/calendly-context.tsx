@@ -4,6 +4,7 @@ import { createContext, useContext, useState, useCallback, ReactNode } from "rea
 
 interface CalendlyConfig {
   eventTypeUri: string;
+  schedulingUrl: string;
   postId: string;
   ctaTitle: string;
   ctaDescription?: string | null;

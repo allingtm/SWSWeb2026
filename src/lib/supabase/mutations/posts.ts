@@ -33,6 +33,14 @@ export interface CreatePostData {
   sources?: object[];
   read_time_minutes?: number;
   word_count?: number;
+  // Enquiry & Calendly fields
+  survey_id?: string | null;
+  enquiry_cta_title?: string | null;
+  calendly_enabled?: boolean;
+  calendly_event_type_uri?: string | null;
+  calendly_scheduling_url?: string | null;
+  calendly_cta_title?: string | null;
+  calendly_cta_description?: string | null;
 }
 
 export interface UpdatePostData extends Partial<CreatePostData> {

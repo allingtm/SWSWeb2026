@@ -119,6 +119,7 @@ export function PostForm({ post, categories, tags, authorId }: PostFormProps) {
   // Calendly state
   const [calendlyEnabled, setCalendlyEnabled] = useState(post?.calendly_enabled || false);
   const [calendlyEventTypeUri, setCalendlyEventTypeUri] = useState(post?.calendly_event_type_uri || "");
+  const [calendlySchedulingUrl, setCalendlySchedulingUrl] = useState(post?.calendly_scheduling_url || "");
   const [calendlyCtaTitle, setCalendlyCtaTitle] = useState(post?.calendly_cta_title || "Schedule a Meeting");
   const [calendlyCtaDescription, setCalendlyCtaDescription] = useState(post?.calendly_cta_description || "");
 
@@ -382,6 +383,7 @@ export function PostForm({ post, categories, tags, authorId }: PostFormProps) {
       // Calendly fields
       calendly_enabled: calendlyEnabled,
       calendly_event_type_uri: calendlyEventTypeUri || null,
+      calendly_scheduling_url: calendlySchedulingUrl || null,
       calendly_cta_title: calendlyCtaTitle || null,
       calendly_cta_description: calendlyCtaDescription || null,
     };
@@ -1337,6 +1339,8 @@ export function PostForm({ post, categories, tags, authorId }: PostFormProps) {
             onEnabledChange={setCalendlyEnabled}
             eventTypeUri={calendlyEventTypeUri}
             onEventTypeUriChange={setCalendlyEventTypeUri}
+            schedulingUrl={calendlySchedulingUrl}
+            onSchedulingUrlChange={setCalendlySchedulingUrl}
             ctaTitle={calendlyCtaTitle}
             onCtaTitleChange={setCalendlyCtaTitle}
             ctaDescription={calendlyCtaDescription}

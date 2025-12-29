@@ -110,10 +110,29 @@ function CalendlyWrapper({ title, description, variant, size, className }: Calen
   );
 }
 
+// Custom paragraph component that unwraps block elements
+// This prevents hydration errors when block elements (figure, div) end up inside <p>
+function ParagraphWrapper({ children, node }: { children?: React.ReactNode; node?: { children?: Array<{ tagName?: string }> } }) {
+  // Check if any child is a block-level element that shouldn't be in a <p>
+  const hasBlockChild = node?.children?.some((child) => {
+    const tagName = child.tagName?.toLowerCase();
+    return tagName && ['figure', 'div', 'mediaimage', 'mediagallery', 'mediavideo', 'mediaaudio', 'calendly', 'table'].includes(tagName);
+  });
+
+  // If there's a block child, render as a div instead of p
+  if (hasBlockChild) {
+    return <div className="my-4">{children}</div>;
+  }
+
+  return <p>{children}</p>;
+}
+
 // Components map for ReactMarkdown
 // These match HTML tag names that can be used in markdown
 // Cast to Components since these are custom elements not in the standard HTML spec
 export const markdownMediaComponents = {
+  // Override paragraph to handle block elements
+  p: ParagraphWrapper,
   // PascalCase versions (for JSX-style usage in MDX)
   MediaImage: MediaImageWrapper,
   MediaGallery: MediaGalleryWrapper,
