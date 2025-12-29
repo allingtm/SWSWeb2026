@@ -98,7 +98,7 @@ function TableOfContents({ headings }: { headings: Heading[] }) {
   return (
     <>
       {/* Desktop TOC */}
-      <div className="sticky top-24 left-0 hidden max-w-xs flex-col self-start pr-10 md:flex">
+      <div className="sticky top-24 left-0 hidden max-w-xs flex-col self-start pr-10 md:flex max-h-[calc(100vh-8rem)] overflow-y-auto">
         <p className="mb-4 text-sm font-semibold text-foreground">On this page</p>
         {headings.map((heading, index) => {
           const isActive = activeId === heading.href;
