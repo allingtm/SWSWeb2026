@@ -83,48 +83,41 @@ export function useLiveChat({
         );
         const result = await response.json();
 
-        if (response.ok && result.messages) {
-          setMessages((prev) => {
-            // Only update if there are new messages
-            if (result.messages.length !== prev.length) {
-              return result.messages;
-            }
-            // Check if last message is different
-            const lastNew = result.messages[result.messages.length - 1];
-            const lastPrev = prev[prev.length - 1];
-            if (lastNew?.id !== lastPrev?.id) {
-              return result.messages;
-            }
-            return prev;
-          });
+        if (response.ok) {
+          // Update messages if changed
+          if (result.messages) {
+            setMessages((prev) => {
+              // Only update if there are new messages
+              if (result.messages.length !== prev.length) {
+                return result.messages;
+              }
+              // Check if last message is different
+              const lastNew = result.messages[result.messages.length - 1];
+              const lastPrev = prev[prev.length - 1];
+              if (lastNew?.id !== lastPrev?.id) {
+                return result.messages;
+              }
+              return prev;
+            });
+          }
+
+          // Update conversation status if changed (e.g., admin closed the chat)
+          if (result.conversation) {
+            setConversation((prev) => {
+              if (prev?.status !== result.conversation.status) {
+                return result.conversation;
+              }
+              return prev;
+            });
+          }
         }
       } catch (err) {
         console.error("Error polling messages:", err);
       }
     }, 2000); // Poll every 2 seconds
 
-    // Also poll for conversation status changes
-    const statusInterval = setInterval(async () => {
-      try {
-        const response = await fetch(`/api/live-chat/visitor?visitor_id=${visitorId}`);
-        const result = await response.json();
-
-        if (response.ok && result.conversation) {
-          setConversation((prev) => {
-            if (prev?.status !== result.conversation.status) {
-              return result.conversation;
-            }
-            return prev;
-          });
-        }
-      } catch (err) {
-        console.error("Error polling conversation:", err);
-      }
-    }, 5000); // Poll status every 5 seconds
-
     return () => {
       clearInterval(pollInterval);
-      clearInterval(statusInterval);
     };
   }, [conversation, visitorId]);
 

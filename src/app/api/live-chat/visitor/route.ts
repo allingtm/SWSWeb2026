@@ -49,10 +49,10 @@ export async function GET(request: Request) {
         );
       }
 
-      // Verify the conversation belongs to this visitor
+      // Verify the conversation belongs to this visitor and get full conversation data
       const { data: conversation, error: convError } = await supabase
         .from("sws2026_chat_conversations")
-        .select("id, visitor_id, status")
+        .select("*")
         .eq("id", conversationId)
         .single();
 
@@ -86,18 +86,20 @@ export async function GET(request: Request) {
         );
       }
 
+      // Return messages AND conversation (so visitor can see status changes)
       return NextResponse.json({
         messages: (messages || []) as ChatMessage[],
+        conversation: conversation as ChatConversation,
       });
     }
 
-    // Fetch the visitor's most recent conversation (any status)
-    // This allows visitor to see when chat is closed
+    // Fetch the visitor's active conversation only
+    // Closed conversations are not returned - visitor can start fresh
     const { data: conversation, error } = await supabase
       .from("sws2026_chat_conversations")
       .select("*")
       .eq("visitor_id", visitorId)
-      .in("status", ["active", "closed"]) // Include closed so visitor sees the status change
+      .eq("status", "active")
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
