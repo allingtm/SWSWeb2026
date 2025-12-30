@@ -209,7 +209,7 @@ export default async function CookiePolicyPage() {
               </li>
               <li>
                 Website:{" "}
-                <a href="https://solvewithsoftware.com">solvewithsoftware.com</a>
+                <a href="https://www.solvewithsoftware.com">www.solvewithsoftware.com</a>
               </li>
             </ul>
             <p>

@@ -65,7 +65,7 @@ export async function POST(request: Request) {
     if (process.env.SENDGRID_API_KEY) {
       console.log("SendGrid API key found, attempting to send email...");
       try {
-        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://solvewithsoftware.com";
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.solvewithsoftware.com";
         const adminUrl = `${siteUrl}/admin/live-chat?conversation=${conversationId}`;
 
         const safeVisitorId = escapeHtml(visitorId.substring(0, 8));

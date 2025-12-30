@@ -3,7 +3,7 @@
 
 ## About This Site
 Name: Solve With Software
-URL: https://solvewithsoftware.com
+URL: https://www.solvewithsoftware.com
 Type: Technology Blog & Software Consultancy
 Founded: 2012
 Location: United Kingdom

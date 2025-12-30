@@ -1,10 +1,10 @@
 # Security Policy for Solve With Software
-# https://solvewithsoftware.com
+# https://www.solvewithsoftware.com
 
 Contact: mailto:hello@solvewithsoftware.com
 Expires: 2026-12-31T23:59:59.000Z
 Preferred-Languages: en
-Canonical: https://solvewithsoftware.com/.well-known/security.txt
+Canonical: https://www.solvewithsoftware.com/.well-known/security.txt
 
 # If you discover a security vulnerability, please report it to us responsibly.
 # We appreciate your help in keeping our users safe.

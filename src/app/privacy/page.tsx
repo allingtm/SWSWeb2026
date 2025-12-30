@@ -46,7 +46,7 @@ export default async function PrivacyPolicyPage() {
               respect your privacy and comply with any applicable law and regulation
               regarding any personal information we may collect about you, including
               across our website,{" "}
-              <a href="https://solvewithsoftware.com">https://solvewithsoftware.com</a>,
+              <a href="https://www.solvewithsoftware.com">https://www.solvewithsoftware.com</a>,
               and other sites we own and operate.
             </p>
 
@@ -589,7 +589,7 @@ export default async function PrivacyPolicyPage() {
               </li>
               <li>
                 Website:{" "}
-                <a href="https://solvewithsoftware.com">https://solvewithsoftware.com</a>
+                <a href="https://www.solvewithsoftware.com">https://www.solvewithsoftware.com</a>
               </li>
             </ul>
             <p>

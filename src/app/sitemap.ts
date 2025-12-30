@@ -6,7 +6,7 @@ import {
 } from "@/lib/supabase/queries";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://solvewithsoftware.com";
+  const baseUrl = "https://www.solvewithsoftware.com";
 
   const [postSlugs, categories, tags] = await Promise.all([
     getAllPostSlugs(),

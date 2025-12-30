@@ -61,11 +61,11 @@ export default async function TermsPage() {
               <h2>Terms of Service</h2>
               <p>
                 These Terms of Service govern your use of the website located at{" "}
-                <a href="https://solvewithsoftware.com">https://solvewithsoftware.com</a> and
+                <a href="https://www.solvewithsoftware.com">https://www.solvewithsoftware.com</a> and
                 any related services provided by Solve With Software Ltd.
               </p>
               <p>
-                By accessing https://solvewithsoftware.com, you agree to abide by these Terms
+                By accessing https://www.solvewithsoftware.com, you agree to abide by these Terms
                 of Service and to comply with all applicable laws and regulations. If you do
                 not agree with these Terms of Service, you are prohibited from using or
                 accessing this website or using any other services provided by Solve With
