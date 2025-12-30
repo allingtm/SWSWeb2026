@@ -91,12 +91,13 @@ export async function GET(request: Request) {
       });
     }
 
-    // Otherwise, fetch the visitor's active conversation
+    // Fetch the visitor's most recent conversation (any status)
+    // This allows visitor to see when chat is closed
     const { data: conversation, error } = await supabase
       .from("sws2026_chat_conversations")
       .select("*")
       .eq("visitor_id", visitorId)
-      .eq("status", "active")
+      .in("status", ["active", "closed"]) // Include closed so visitor sees the status change
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
