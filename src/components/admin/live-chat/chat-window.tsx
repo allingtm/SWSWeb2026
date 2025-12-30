@@ -136,7 +136,13 @@ export function ChatWindow({
           {/* Visitor info */}
           <div>
             <h3 className="font-medium">{visitorDisplayName}</h3>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
+              {conversation.visitor_email && (
+                <span>{conversation.visitor_email}</span>
+              )}
+              {conversation.visitor_email && conversation.post && (
+                <span>•</span>
+              )}
               {conversation.post ? (
                 <a
                   href={`/blog/${conversation.post.slug}`}
@@ -147,9 +153,9 @@ export function ChatWindow({
                   <ExternalLink className="w-3 h-3" />
                   {conversation.post.title}
                 </a>
-              ) : (
+              ) : !conversation.visitor_email ? (
                 <span>Direct chat</span>
-              )}
+              ) : null}
             </div>
           </div>
         </div>

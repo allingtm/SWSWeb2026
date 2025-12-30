@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { AdminHeader } from "@/components/admin/admin-header";
+import { ChatNotificationModal } from "@/components/admin/chat-notification-modal";
+import { useChatNotifications } from "@/hooks/use-chat-notifications";
 import type { BlogAuthor } from "@/types";
 
 interface AdminLayoutClientProps {
@@ -15,9 +17,11 @@ export function AdminLayoutClient({
   children,
 }: AdminLayoutClientProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { newChat, dismissNotification } = useChatNotifications();
 
   return (
     <div className="min-h-screen bg-muted/30">
+      <ChatNotificationModal chat={newChat} onDismiss={dismissNotification} />
       <div className="flex">
         <AdminSidebar
           isOpen={sidebarOpen}

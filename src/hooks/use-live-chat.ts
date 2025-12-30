@@ -14,6 +14,8 @@ import type {
 
 interface UseLiveChatOptions {
   visitorId: string;
+  visitorName?: string;
+  visitorEmail?: string;
   postId?: string;
   sourceUrl?: string;
   consentGiven?: boolean;
@@ -32,6 +34,8 @@ interface UseLiveChatReturn {
 
 export function useLiveChat({
   visitorId,
+  visitorName,
+  visitorEmail,
   postId,
   sourceUrl,
   consentGiven = false,
@@ -151,6 +155,8 @@ export function useLiveChat({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           visitor_id: visitorId,
+          visitor_name: visitorName,
+          visitor_email: visitorEmail,
           post_id: postId,
           source_url: sourceUrl,
           consent_given: consentGiven,
@@ -192,7 +198,7 @@ export function useLiveChat({
       setError("Failed to start conversation");
       return null;
     }
-  }, [visitorId, postId, sourceUrl, consentGiven]);
+  }, [visitorId, visitorName, visitorEmail, postId, sourceUrl, consentGiven]);
 
   // Send a message
   const sendMessage = useCallback(

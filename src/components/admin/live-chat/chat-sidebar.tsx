@@ -90,6 +90,11 @@ export function ChatSidebar({
                     {conversation.visitor_name ||
                       `Visitor ${conversation.visitor_id.substring(0, 8)}`}
                   </div>
+                  {conversation.visitor_email && (
+                    <div className="text-xs text-muted-foreground truncate max-w-32">
+                      {conversation.visitor_email}
+                    </div>
+                  )}
                   {conversation.post && (
                     <div className="flex items-center gap-1 text-xs text-muted-foreground">
                       <ExternalLink className="w-3 h-3" />

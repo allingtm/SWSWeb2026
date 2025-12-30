@@ -31,6 +31,9 @@ export function LiveChatDialog({
 }: LiveChatDialogProps) {
   const visitorId = useVisitorId();
   const [consentGiven, setConsentGiven] = useState(false);
+  const [visitorName, setVisitorName] = useState("");
+  const [visitorEmail, setVisitorEmail] = useState("");
+  const [formErrors, setFormErrors] = useState<{ name?: string; email?: string }>({});
 
   const {
     conversation,
@@ -39,13 +42,52 @@ export function LiveChatDialog({
     sendMessage,
     adminTyping,
     setVisitorTyping,
-    startConversation,
   } = useLiveChat({
     visitorId,
+    visitorName: visitorName.trim(),
+    visitorEmail: visitorEmail.trim(),
     postId,
     sourceUrl,
     consentGiven,
   });
+
+  // Check if email is valid format
+  const isEmailValid = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  // Check if form can enable chat (basic checks without setting errors)
+  const canStartChat =
+    consentGiven &&
+    visitorName.trim().length > 0 &&
+    visitorName.trim().length <= 30 &&
+    visitorEmail.trim().length > 0 &&
+    isEmailValid(visitorEmail.trim());
+
+  // Validate and set errors (called on blur)
+  const validateField = (field: "name" | "email") => {
+    const errors = { ...formErrors };
+
+    if (field === "name") {
+      if (!visitorName.trim()) {
+        errors.name = "Name is required";
+      } else if (visitorName.length > 30) {
+        errors.name = "Name must be 30 characters or less";
+      } else {
+        delete errors.name;
+      }
+    }
+
+    if (field === "email") {
+      if (!visitorEmail.trim()) {
+        errors.email = "Email is required";
+      } else if (!isEmailValid(visitorEmail)) {
+        errors.email = "Please enter a valid email";
+      } else {
+        delete errors.email;
+      }
+    }
+
+    setFormErrors(errors);
+  };
 
   const isChatClosed = conversation?.status === "closed" || conversation?.status === "archived";
 
@@ -134,7 +176,7 @@ export function LiveChatDialog({
               <div className="flex items-center justify-center h-full">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
               </div>
-            ) : messages.length === 0 ? (
+            ) : messages.length === 0 && !conversation ? (
               <div className="flex flex-col items-center justify-center h-full text-center p-4">
                 <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
                   <span className="text-2xl">👋</span>
@@ -143,9 +185,42 @@ export function LiveChatDialog({
                 <p className="text-sm text-muted-foreground mb-4">
                   Chat with one of our experts now.
                 </p>
-                {/* Privacy consent checkbox */}
-                {!conversation && (
-                  <label className="flex items-start gap-2 text-left text-sm cursor-pointer max-w-xs">
+
+                {/* Name and email form */}
+                <div className="w-full max-w-xs space-y-3">
+                  {/* Name input */}
+                  <div className="text-left">
+                    <input
+                      type="text"
+                      placeholder="First name *"
+                      value={visitorName}
+                      onChange={(e) => setVisitorName(e.target.value)}
+                      onBlur={() => validateField("name")}
+                      maxLength={30}
+                      className="w-full px-3 py-2 border border-input rounded-lg text-base bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                    />
+                    {formErrors.name && (
+                      <p className="text-destructive text-xs mt-1">{formErrors.name}</p>
+                    )}
+                  </div>
+
+                  {/* Email input */}
+                  <div className="text-left">
+                    <input
+                      type="email"
+                      placeholder="Email address *"
+                      value={visitorEmail}
+                      onChange={(e) => setVisitorEmail(e.target.value)}
+                      onBlur={() => validateField("email")}
+                      className="w-full px-3 py-2 border border-input rounded-lg text-base bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                    />
+                    {formErrors.email && (
+                      <p className="text-destructive text-xs mt-1">{formErrors.email}</p>
+                    )}
+                  </div>
+
+                  {/* Privacy consent checkbox */}
+                  <label className="flex items-start gap-2 text-left text-sm cursor-pointer">
                     <input
                       type="checkbox"
                       checked={consentGiven}
@@ -163,7 +238,17 @@ export function LiveChatDialog({
                       </Link>
                     </span>
                   </label>
-                )}
+                </div>
+              </div>
+            ) : messages.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full text-center p-4">
+                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+                  <span className="text-2xl">👋</span>
+                </div>
+                <h3 className="font-medium mb-1">Start a conversation</h3>
+                <p className="text-sm text-muted-foreground">
+                  Send your first message below.
+                </p>
               </div>
             ) : (
               <>
@@ -192,10 +277,10 @@ export function LiveChatDialog({
                 This conversation has been closed.
               </p>
             </div>
-          ) : !conversation && !consentGiven ? (
+          ) : !conversation && !canStartChat ? (
             <div className="flex flex-col items-center justify-center py-4 text-center border-t border-border bg-muted/30">
               <p className="text-sm text-muted-foreground">
-                Please accept the Privacy Policy to start chatting.
+                Please fill in your details above to start chatting.
               </p>
             </div>
           ) : (

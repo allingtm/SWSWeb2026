@@ -10,6 +10,7 @@ export interface ChatConversation {
   id: string;
   visitor_id: string;
   visitor_name: string | null;
+  visitor_email: string | null;
   visitor_ip: string | null;
   post_id: string | null;
   source_url: string | null;

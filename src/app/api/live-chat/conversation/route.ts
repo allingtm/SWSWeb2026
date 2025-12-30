@@ -29,6 +29,7 @@ function getSupabaseClient() {
 interface CreateConversationBody {
   visitor_id: string;
   visitor_name?: string;
+  visitor_email?: string;
   post_id?: string;
   source_url?: string;
   consent_given?: boolean;
@@ -47,7 +48,7 @@ export async function POST(request: Request) {
     }
 
     const body: CreateConversationBody = await request.json();
-    const { visitor_id, visitor_name, post_id, source_url, consent_given } = body;
+    const { visitor_id, visitor_name, visitor_email, post_id, source_url, consent_given } = body;
 
     if (!visitor_id) {
       return NextResponse.json(
@@ -60,6 +61,23 @@ export async function POST(request: Request) {
     if (!UUID_REGEX.test(visitor_id)) {
       return NextResponse.json(
         { error: "Invalid visitor_id format" },
+        { status: 400 }
+      );
+    }
+
+    // Validate name (max 30 chars)
+    if (visitor_name && visitor_name.length > 30) {
+      return NextResponse.json(
+        { error: "Name must be 30 characters or less" },
+        { status: 400 }
+      );
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (visitor_email && !emailRegex.test(visitor_email)) {
+      return NextResponse.json(
+        { error: "Invalid email format" },
         { status: 400 }
       );
     }
@@ -94,6 +112,7 @@ export async function POST(request: Request) {
       .insert({
         visitor_id,
         visitor_name: visitor_name || null,
+        visitor_email: visitor_email || null,
         post_id: post_id || null,
         source_url: source_url || null,
         visitor_ip: consent_given ? clientIP : null,
