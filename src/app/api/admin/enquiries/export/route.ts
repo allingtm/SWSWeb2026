@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getAllEnquiries } from "@/lib/supabase/queries/enquiries";
 
-export async function GET(request: NextRequest) {
+// Changed from GET to POST for CSRF protection
+export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -11,12 +12,28 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { searchParams } = new URL(request.url);
-    const surveyId = searchParams.get("surveyId") || undefined;
-    const postId = searchParams.get("postId") || undefined;
-    const status = searchParams.get("status") as 'new' | 'read' | 'archived' | null;
-    const dateFrom = searchParams.get("dateFrom") || undefined;
-    const dateTo = searchParams.get("dateTo") || undefined;
+    // Check if user has export permission
+    const { data: author } = await supabase
+      .from("sws2026_blog_authors")
+      .select("can_export")
+      .eq("user_id", user.id)
+      .eq("is_active", true)
+      .single();
+
+    if (!author?.can_export) {
+      return NextResponse.json(
+        { error: "Export permission denied" },
+        { status: 403 }
+      );
+    }
+
+    // Get filters from request body (POST) instead of query params
+    const body = await request.json().catch(() => ({}));
+    const surveyId = body.surveyId || undefined;
+    const postId = body.postId || undefined;
+    const status = body.status as 'new' | 'read' | 'archived' | null;
+    const dateFrom = body.dateFrom || undefined;
+    const dateTo = body.dateTo || undefined;
 
     const { enquiries } = await getAllEnquiries({
       surveyId,

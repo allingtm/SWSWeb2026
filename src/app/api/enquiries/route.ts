@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSurveyById } from "@/lib/supabase/queries/surveys";
+import {
+  checkRateLimit,
+  getClientIP,
+  rateLimitResponse,
+  RATE_LIMITS,
+} from "@/lib/rate-limit";
 
 interface EnquirySubmission {
   survey_id: string;
@@ -10,6 +16,13 @@ interface EnquirySubmission {
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting check
+    const clientIP = getClientIP(request);
+    const rateLimit = await checkRateLimit(clientIP, "enquiry", RATE_LIMITS.enquiry);
+    if (!rateLimit.success) {
+      return rateLimitResponse(rateLimit);
+    }
+
     const body: EnquirySubmission = await request.json();
 
     // Validate required fields
@@ -122,17 +135,28 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// Email validation regex
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function isValidEmail(email: string): boolean {
+  return EMAIL_REGEX.test(email);
+}
+
 // Helper to extract email from response data
 function extractEmail(data: Record<string, unknown>): string | null {
   const emailKeys = ["email", "Email", "EMAIL", "e-mail", "emailAddress", "email_address"];
   for (const key of emailKeys) {
     if (data[key] && typeof data[key] === "string") {
-      return data[key] as string;
+      const email = data[key] as string;
+      // Validate email format before returning
+      if (isValidEmail(email)) {
+        return email;
+      }
     }
   }
-  // Search nested objects
+  // Search nested objects with proper validation
   for (const value of Object.values(data)) {
-    if (typeof value === "string" && value.includes("@") && value.includes(".")) {
+    if (typeof value === "string" && isValidEmail(value)) {
       return value;
     }
   }

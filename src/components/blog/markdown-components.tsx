@@ -4,6 +4,7 @@ import type { Components } from "react-markdown";
 import { MediaImage, MediaGallery, MediaVideo, MediaAudio } from "./media";
 import { markdownTableComponents } from "./markdown-table-components";
 import { CalendlyShortcode } from "./calendly-trigger";
+import { LiveChatShortcode } from "./live-chat-shortcode";
 
 // Custom component wrapper types
 interface MediaImageComponentProps {
@@ -41,6 +42,12 @@ interface CalendlyComponentProps {
   variant?: string;
   size?: string;
   className?: string;
+}
+
+interface LiveChatComponentProps {
+  className?: string;
+  title?: string;
+  description?: string;
 }
 
 // Component wrapper for MediaImage that handles string props from HTML
@@ -110,13 +117,24 @@ function CalendlyWrapper({ title, description, variant, size, className }: Calen
   );
 }
 
+// Component wrapper for LiveChat widget
+function LiveChatWrapper({ className, title, description }: LiveChatComponentProps) {
+  return (
+    <LiveChatShortcode
+      className={className}
+      title={title}
+      description={description}
+    />
+  );
+}
+
 // Custom paragraph component that unwraps block elements
 // This prevents hydration errors when block elements (figure, div) end up inside <p>
 function ParagraphWrapper({ children, node }: { children?: React.ReactNode; node?: { children?: Array<{ tagName?: string }> } }) {
   // Check if any child is a block-level element that shouldn't be in a <p>
   const hasBlockChild = node?.children?.some((child) => {
     const tagName = child.tagName?.toLowerCase();
-    return tagName && ['figure', 'div', 'mediaimage', 'mediagallery', 'mediavideo', 'mediaaudio', 'calendly', 'table'].includes(tagName);
+    return tagName && ['figure', 'div', 'mediaimage', 'mediagallery', 'mediavideo', 'mediaaudio', 'calendly', 'livechat', 'table'].includes(tagName);
   });
 
   // If there's a block child, render as a div instead of p
@@ -146,6 +164,9 @@ export const markdownMediaComponents = {
   // Calendly booking trigger shortcode
   Calendly: CalendlyWrapper,
   calendly: CalendlyWrapper,
+  // LiveChat widget shortcode
+  LiveChat: LiveChatWrapper,
+  livechat: LiveChatWrapper,
   // Table components for responsive tables
   ...markdownTableComponents,
 } as Partial<Components>;

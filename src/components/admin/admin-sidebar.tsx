@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FileText, FolderOpen, Tags, Image, X, ClipboardList, MessageSquare } from "lucide-react";
+import { LayoutDashboard, FileText, FolderOpen, Tags, Image, X, ClipboardList, MessageSquare, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -14,6 +14,7 @@ const navigation = [
   { name: "Tags", href: "/admin/tags", icon: Tags },
   { name: "Surveys", href: "/admin/surveys", icon: ClipboardList },
   { name: "Enquiries", href: "/admin/enquiries", icon: MessageSquare },
+  { name: "Live Chat", href: "/admin/live-chat", icon: MessageCircle },
 ];
 
 interface AdminSidebarProps {

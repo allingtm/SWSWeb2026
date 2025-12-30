@@ -10,6 +10,7 @@ export interface BlogAuthor {
   social_links: Record<string, string>;
   expertise: string[] | null;
   is_active: boolean;
+  can_export: boolean;
   created_at: string;
   updated_at: string;
 }

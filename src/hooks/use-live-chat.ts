@@ -1,0 +1,283 @@
+"use client";
+
+import { useState, useEffect, useCallback, useRef } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { getMessages, getConversationByVisitorId } from "@/lib/supabase/queries/live-chat";
+import { createMessage } from "@/lib/supabase/mutations/live-chat";
+import type {
+  ChatMessage,
+  ChatConversation,
+  TypingState,
+  VisitorTypingPayload,
+  AdminTypingPayload,
+} from "@/types/live-chat";
+
+interface UseLiveChatOptions {
+  visitorId: string;
+  postId?: string;
+  sourceUrl?: string;
+  consentGiven?: boolean;
+}
+
+interface UseLiveChatReturn {
+  conversation: ChatConversation | null;
+  messages: ChatMessage[];
+  isLoading: boolean;
+  error: string | null;
+  sendMessage: (content: string) => Promise<void>;
+  adminTyping: TypingState;
+  setVisitorTyping: (isTyping: boolean, text?: string) => void;
+  startConversation: () => Promise<ChatConversation | null>;
+}
+
+export function useLiveChat({
+  visitorId,
+  postId,
+  sourceUrl,
+  consentGiven = false,
+}: UseLiveChatOptions): UseLiveChatReturn {
+  const [conversation, setConversation] = useState<ChatConversation | null>(null);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [adminTyping, setAdminTyping] = useState<TypingState>({ isTyping: false });
+
+  const channelRef = useRef<ReturnType<ReturnType<typeof createClient>["channel"]> | null>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const adminTypingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Fetch existing conversation for this visitor
+  useEffect(() => {
+    if (!visitorId) return;
+
+    async function fetchConversation() {
+      try {
+        const existingConversation = await getConversationByVisitorId(visitorId);
+        if (existingConversation) {
+          setConversation(existingConversation);
+          const msgs = await getMessages(existingConversation.id);
+          setMessages(msgs);
+        }
+      } catch (err) {
+        console.error("Error fetching conversation:", err);
+        setError("Failed to load conversation");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchConversation();
+  }, [visitorId]);
+
+  // Subscribe to real-time updates when conversation exists
+  useEffect(() => {
+    if (!conversation) return;
+
+    const supabase = createClient();
+    const channelName = `live-chat:conversation:${conversation.id}`;
+
+    const channel = supabase
+      .channel(channelName)
+      // Listen for new messages
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "sws2026_chat_messages",
+          filter: `conversation_id=eq.${conversation.id}`,
+        },
+        (payload) => {
+          const newMessage = payload.new as ChatMessage;
+          setMessages((prev) => {
+            // Avoid duplicates
+            if (prev.some((m) => m.id === newMessage.id)) return prev;
+            return [...prev, newMessage];
+          });
+        }
+      )
+      // Listen for conversation status changes (e.g., when admin closes chat)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "sws2026_chat_conversations",
+          filter: `id=eq.${conversation.id}`,
+        },
+        (payload) => {
+          const updated = payload.new as ChatConversation;
+          setConversation(updated);
+        }
+      )
+      // Listen for admin typing
+      .on("broadcast", { event: "admin-typing" }, (payload) => {
+        const typingPayload = payload.payload as AdminTypingPayload;
+        setAdminTyping({ isTyping: typingPayload.typing });
+
+        // Clear typing indicator after 3 seconds of inactivity
+        if (adminTypingTimeoutRef.current) {
+          clearTimeout(adminTypingTimeoutRef.current);
+        }
+        if (typingPayload.typing) {
+          adminTypingTimeoutRef.current = setTimeout(() => {
+            setAdminTyping({ isTyping: false });
+          }, 3000);
+        }
+      })
+      .subscribe();
+
+    channelRef.current = channel;
+
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+      if (adminTypingTimeoutRef.current) {
+        clearTimeout(adminTypingTimeoutRef.current);
+      }
+      supabase.removeChannel(channel);
+    };
+  }, [conversation]);
+
+  // Start a new conversation (uses API route for IP capture)
+  const startConversation = useCallback(async (): Promise<ChatConversation | null> => {
+    if (!visitorId) return null;
+
+    try {
+      // Use API route to capture visitor IP (only if consent given)
+      const response = await fetch("/api/live-chat/conversation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          visitor_id: visitorId,
+          post_id: postId,
+          source_url: sourceUrl,
+          consent_given: consentGiven,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        setError(result.error || "Failed to start conversation");
+        return null;
+      }
+
+      if (!result.conversation) {
+        setError("Failed to start conversation");
+        return null;
+      }
+
+      setConversation(result.conversation);
+
+      // Send email notification to admin (fire and forget)
+      fetch("/api/live-chat/notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          conversationId: result.conversation.id,
+          visitorId,
+          postTitle: result.postTitle,
+          sourceUrl,
+        }),
+      }).catch((err) => {
+        // Don't block on notification failure
+        console.error("Failed to send chat notification:", err);
+      });
+
+      return result.conversation;
+    } catch (err) {
+      console.error("Error starting conversation:", err);
+      setError("Failed to start conversation");
+      return null;
+    }
+  }, [visitorId, postId, sourceUrl, consentGiven]);
+
+  // Send a message
+  const sendMessage = useCallback(
+    async (content: string) => {
+      if (!content.trim()) return;
+
+      let currentConversation = conversation;
+
+      // Start conversation if it doesn't exist
+      if (!currentConversation) {
+        currentConversation = await startConversation();
+        if (!currentConversation) return;
+      }
+
+      try {
+        // Don't allow sending messages to closed conversations
+        if (currentConversation.status === "closed") {
+          setError("This conversation has been closed");
+          return;
+        }
+
+        const result = await createMessage({
+          conversation_id: currentConversation.id,
+          sender_type: "visitor",
+          content: content.trim(),
+        });
+
+        if (result.error) {
+          setError(result.error);
+        }
+        // Message will be added via real-time subscription
+      } catch (err) {
+        console.error("Error sending message:", err);
+        setError("Failed to send message");
+      }
+    },
+    [conversation, startConversation]
+  );
+
+  // Broadcast visitor typing state (only isTyping boolean for privacy)
+  const setVisitorTyping = useCallback(
+    (isTyping: boolean, _text?: string) => {
+      if (!channelRef.current) return;
+
+      // Security: Only broadcast typing status, not the actual text content
+      // This prevents exposing message content before the user hits send
+      const payload: VisitorTypingPayload = {
+        typing: isTyping,
+        text: "", // Never send actual text for privacy
+        visitor_id: visitorId,
+      };
+
+      channelRef.current.send({
+        type: "broadcast",
+        event: "visitor-typing",
+        payload,
+      });
+
+      // Clear typing after 2 seconds of inactivity
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+      if (isTyping) {
+        typingTimeoutRef.current = setTimeout(() => {
+          if (channelRef.current) {
+            channelRef.current.send({
+              type: "broadcast",
+              event: "visitor-typing",
+              payload: { typing: false, text: "", visitor_id: visitorId },
+            });
+          }
+        }, 2000);
+      }
+    },
+    [visitorId]
+  );
+
+  return {
+    conversation,
+    messages,
+    isLoading,
+    error,
+    sendMessage,
+    adminTyping,
+    setVisitorTyping,
+    startConversation,
+  };
+}

@@ -66,14 +66,39 @@ export default function EnquiriesPage() {
     fetchData();
   }, [fetchData]);
 
-  const handleExport = () => {
-    const params = new URLSearchParams();
-    if (filters.surveyId) params.set("surveyId", filters.surveyId);
-    if (filters.status) params.set("status", filters.status);
-    if (filters.dateFrom) params.set("dateFrom", filters.dateFrom);
-    if (filters.dateTo) params.set("dateTo", filters.dateTo);
+  const handleExport = async () => {
+    try {
+      const response = await fetch("/api/admin/enquiries/export", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          surveyId: filters.surveyId,
+          status: filters.status,
+          dateFrom: filters.dateFrom,
+          dateTo: filters.dateTo,
+        }),
+      });
 
-    window.open(`/api/admin/enquiries/export?${params.toString()}`, "_blank");
+      if (!response.ok) {
+        const error = await response.json();
+        alert(error.error || "Failed to export enquiries");
+        return;
+      }
+
+      // Download the CSV file
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `enquiries-export-${new Date().toISOString().split("T")[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error("Export error:", error);
+      alert("Failed to export enquiries");
+    }
   };
 
   return (

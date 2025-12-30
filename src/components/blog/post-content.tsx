@@ -18,6 +18,7 @@ import { formatDate } from "@/lib/utils";
 import { EnquiryCTAInline } from "./enquiry-cta-inline";
 import { CalendlyProvider } from "./calendly-context";
 import { CalendlyBookingModal } from "./calendly-booking-modal";
+import { LiveChatProvider } from "./live-chat-context";
 import type { BlogPostWithRelations } from "@/types";
 
 // Lazy-load enquiry components - only loaded when post has enquiry configured
@@ -200,8 +201,14 @@ export function PostContent({ post }: PostContentProps) {
         }
       : null;
 
+  // LiveChat config for the provider
+  const liveChatConfig = {
+    postId: post.id,
+  };
+
   return (
     <CalendlyProvider config={calendlyConfig}>
+    <LiveChatProvider config={liveChatConfig}>
     <article className="py-8">
       {/* Floating CTA - always visible when scrolling */}
       {hasEnquiry && (
@@ -436,6 +443,7 @@ export function PostContent({ post }: PostContentProps) {
       {/* Calendly Booking Modal */}
       <CalendlyBookingModal />
     </article>
+    </LiveChatProvider>
     </CalendlyProvider>
   );
 }
