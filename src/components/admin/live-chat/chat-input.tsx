@@ -79,7 +79,7 @@ export function ChatInput({
   };
 
   return (
-    <div className="flex items-end gap-2 p-4 border-t border-border bg-background">
+    <div className="flex items-end gap-2 p-4 border-t border-border bg-background w-full max-w-full box-border">
       <textarea
         ref={textareaRef}
         value={message}
@@ -89,7 +89,7 @@ export function ChatInput({
         disabled={disabled}
         rows={1}
         className={cn(
-          "flex-1 resize-none rounded-xl border border-input bg-background px-4 py-3",
+          "flex-1 min-w-0 resize-none rounded-xl border border-input bg-background px-4 py-3",
           "text-sm placeholder:text-muted-foreground",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
           "disabled:cursor-not-allowed disabled:opacity-50",

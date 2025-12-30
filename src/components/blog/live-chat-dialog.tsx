@@ -102,7 +102,7 @@ export function LiveChatDialog({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ duration: 0.2 }}
-          className="relative bg-background w-full h-full sm:h-auto sm:max-h-[80dvh] sm:max-w-md sm:rounded-xl shadow-2xl flex flex-col overflow-hidden"
+          className="relative bg-background w-full max-w-full h-full sm:h-auto sm:max-h-[80dvh] sm:max-w-md sm:rounded-xl shadow-2xl flex flex-col overflow-hidden"
         >
           {/* Header */}
           <div className="relative p-4 border-b border-border bg-primary text-primary-foreground">
