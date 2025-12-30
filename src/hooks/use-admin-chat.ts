@@ -325,6 +325,12 @@ export function useAdminChat(): UseAdminChatReturn {
     }
   }, [settings]);
 
+  // Clear active conversation (used after deleting)
+  const clearActiveConversation = useCallback(() => {
+    setActiveConversation(null);
+    setMessages([]);
+  }, []);
+
   return {
     conversations,
     activeConversation,
@@ -340,5 +346,6 @@ export function useAdminChat(): UseAdminChatReturn {
     closeConversation,
     toggleOnline,
     refreshConversations,
+    clearActiveConversation,
   };
 }

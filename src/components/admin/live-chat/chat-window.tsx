@@ -34,6 +34,7 @@ interface ChatWindowProps {
   onTyping: (isTyping: boolean) => void;
   onClose: () => void;
   onCloseConversation: () => void;
+  onDeleteConversation: () => void;
 }
 
 export function ChatWindow({
@@ -44,6 +45,7 @@ export function ChatWindow({
   onTyping,
   onClose,
   onCloseConversation,
+  onDeleteConversation,
 }: ChatWindowProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -97,7 +99,7 @@ export function ChatWindow({
       const result = await deleteConversation(conversation.id);
       if (result.success) {
         setShowDeleteDialog(false);
-        onClose();
+        onDeleteConversation();
       } else {
         alert(result.error || "Failed to delete conversation");
       }

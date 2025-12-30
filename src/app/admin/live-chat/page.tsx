@@ -22,6 +22,7 @@ export default function LiveChatPage() {
     closeConversation,
     toggleOnline,
     refreshConversations,
+    clearActiveConversation,
   } = useAdminChat();
 
   // Mobile: toggle between list and chat view
@@ -41,6 +42,11 @@ export default function LiveChatPage() {
       await closeConversation(activeConversation.id);
       setShowChatOnMobile(false);
     }
+  };
+
+  const handleDeleteConversation = () => {
+    clearActiveConversation();
+    setShowChatOnMobile(false);
   };
 
   if (isLoading) {
@@ -125,6 +131,7 @@ export default function LiveChatPage() {
               onTyping={setAdminTyping}
               onClose={handleCloseChat}
               onCloseConversation={handleCloseConversation}
+              onDeleteConversation={handleDeleteConversation}
             />
           ) : (
             <div className="flex flex-col items-center justify-center h-full text-center p-6">
