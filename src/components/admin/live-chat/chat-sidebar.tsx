@@ -72,7 +72,7 @@ export function ChatSidebar({
               "w-full p-4 text-left border-b border-border transition-colors",
               "hover:bg-muted/50",
               activeConversationId === conversation.id && "bg-muted",
-              conversation.status === "active" && !conversation.admin_has_replied && "bg-green-50 dark:bg-green-950/30"
+              conversation.status === "active" && !conversation.admin_has_replied && conversation.last_message && "bg-green-50 dark:bg-green-950/30"
             )}
           >
             <div className="flex items-start justify-between gap-2 mb-1">
