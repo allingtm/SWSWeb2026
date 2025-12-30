@@ -136,6 +136,23 @@ export default async function PrivacyPolicyPage() {
               <li>Phone/mobile number</li>
             </ul>
 
+            <h3>Live Chat</h3>
+            <p>
+              When you use our live chat feature, we collect the following information:
+            </p>
+            <ul>
+              <li>Chat messages and conversation history</li>
+              <li>Your IP address (used for rate limiting and to prevent abuse)</li>
+              <li>A visitor identifier stored in your browser&apos;s local storage to maintain your conversation</li>
+              <li>The page URL from which you initiated the chat</li>
+            </ul>
+            <p>
+              Before starting a chat, you must consent to this data collection by accepting
+              our Privacy Policy. Chat conversations are stored to provide you with continuity
+              in your support experience and to help us improve our services. Your IP address
+              may be used to block abusive users from the chat service.
+            </p>
+
             <h3>User-Generated Content</h3>
             <p>
               We consider &apos;user-generated content&apos; to be materials (text, image and/or

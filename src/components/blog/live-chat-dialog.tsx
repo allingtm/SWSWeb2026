@@ -155,7 +155,7 @@ export function LiveChatDialog({
                     <span className="text-muted-foreground">
                       I agree to the{" "}
                       <Link
-                        href="/privacy-policy"
+                        href="/privacy"
                         target="_blank"
                         className="text-primary underline hover:no-underline"
                       >
