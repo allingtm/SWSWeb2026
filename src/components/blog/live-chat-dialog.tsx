@@ -158,8 +158,8 @@ export function LiveChatDialog({
             </Button>
             <div className="flex items-center gap-3 pr-8">
               {/* Avatar */}
-              <div className="w-10 h-10 rounded-full bg-primary-foreground/20 flex items-center justify-center border-2 border-primary-foreground/30">
-                <span className="text-lg">💬</span>
+              <div className="w-10 h-10 rounded-full bg-primary-foreground/20 flex items-center justify-center">
+                <span className="text-xl">💬</span>
               </div>
               <div>
                 <h2 className="font-semibold">{title}</h2>
