@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { getMessages, getConversationByVisitorId } from "@/lib/supabase/queries/live-chat";
-import { createMessage } from "@/lib/supabase/mutations/live-chat";
 import type {
   ChatMessage,
   ChatConversation,
@@ -220,14 +219,20 @@ export function useLiveChat({
           return;
         }
 
-        const result = await createMessage({
-          conversation_id: currentConversation.id,
-          sender_type: "visitor",
-          content: content.trim(),
+        // Use API route for visitor messages (service role bypasses RLS)
+        const response = await fetch("/api/live-chat/message", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            conversation_id: currentConversation.id,
+            content: content.trim(),
+          }),
         });
 
-        if (result.error) {
-          setError(result.error);
+        const result = await response.json();
+
+        if (!response.ok) {
+          setError(result.error || "Failed to send message");
         }
         // Message will be added via real-time subscription
       } catch (err) {
