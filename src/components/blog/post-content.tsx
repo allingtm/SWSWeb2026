@@ -19,7 +19,14 @@ import { EnquiryCTAInline } from "./enquiry-cta-inline";
 import { CalendlyProvider } from "./calendly-context";
 import { CalendlyBookingModal } from "./calendly-booking-modal";
 import { LiveChatProvider } from "./live-chat-context";
+import { useChatPresence } from "@/hooks/use-chat-presence";
 import type { BlogPostWithRelations } from "@/types";
+
+// Lazy-load live chat floating button
+const LiveChatFloatingButton = dynamic(
+  () => import("./live-chat-widget").then((mod) => mod.LiveChatFloatingButton),
+  { ssr: false }
+);
 
 // Lazy-load enquiry components - only loaded when post has enquiry configured
 const EnquiryCTAFloating = dynamic(
@@ -185,9 +192,19 @@ function TableOfContents({ headings }: { headings: Heading[] }) {
 export function PostContent({ post }: PostContentProps) {
   const headings = extractHeadings(post.content);
   const [isEnquiryModalOpen, setIsEnquiryModalOpen] = useState(false);
+  const { isAdminOnline, isBlocked, isLoading: isChatLoading } = useChatPresence();
 
   // Check if post has an enquiry form configured
   const hasEnquiry = post.survey && post.enquiry_cta_title;
+
+  // Chat is live if admin is online and user is not blocked
+  const isChatLive = isAdminOnline && !isBlocked;
+
+  // Show enquiry only if chat is not live (or still loading - show enquiry as fallback)
+  const showEnquiry = hasEnquiry && (isChatLoading || !isChatLive);
+
+  // Show chat floating button only when chat is live
+  const showChatButton = !isChatLoading && isChatLive;
 
   // Calendly config for the provider
   const calendlyConfig =
@@ -210,11 +227,18 @@ export function PostContent({ post }: PostContentProps) {
     <CalendlyProvider config={calendlyConfig}>
     <LiveChatProvider config={liveChatConfig}>
     <article className="py-8">
-      {/* Floating CTA - always visible when scrolling */}
-      {hasEnquiry && (
+      {/* Floating CTA - show enquiry if chat is offline, show chat if live */}
+      {showEnquiry && (
         <EnquiryCTAFloating
           ctaTitle={post.enquiry_cta_title!}
           onOpenModal={() => setIsEnquiryModalOpen(true)}
+        />
+      )}
+      {showChatButton && (
+        <LiveChatFloatingButton
+          postId={post.id}
+          title="Chat with us"
+          description={post.enquiry_cta_title || undefined}
         />
       )}
 
@@ -339,8 +363,8 @@ export function PostContent({ post }: PostContentProps) {
               </ReactMarkdown>
             </div>
 
-            {/* Inline Enquiry CTA */}
-            {hasEnquiry && (
+            {/* Inline Enquiry CTA - only show when chat is offline */}
+            {showEnquiry && (
               <EnquiryCTAInline
                 ctaTitle={post.enquiry_cta_title!}
                 onOpenModal={() => setIsEnquiryModalOpen(true)}
