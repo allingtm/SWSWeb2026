@@ -23,7 +23,7 @@ import {
 import { ChatMessage } from "./chat-message";
 import { ChatInput } from "./chat-input";
 import { TypingIndicator } from "./typing-indicator";
-import { blockIP } from "@/lib/supabase/mutations/live-chat";
+import { blockIP, deleteConversation } from "@/lib/supabase/mutations/live-chat";
 import type { ChatConversationWithDetails, ChatMessage as ChatMessageType, TypingState } from "@/types/live-chat";
 
 interface ChatWindowProps {
@@ -49,6 +49,8 @@ export function ChatWindow({
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [showBlockDialog, setShowBlockDialog] = useState(false);
   const [isBlocking, setIsBlocking] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -89,8 +91,26 @@ export function ChatWindow({
     }
   };
 
+  const handleDeleteConversation = async () => {
+    setIsDeleting(true);
+    try {
+      const result = await deleteConversation(conversation.id);
+      if (result.success) {
+        setShowDeleteDialog(false);
+        onClose();
+      } else {
+        alert(result.error || "Failed to delete conversation");
+      }
+    } catch (err) {
+      console.error("Error deleting conversation:", err);
+      alert("Failed to delete conversation");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
-    <div className="flex flex-col h-full bg-background">
+    <div className="relative flex flex-col h-full bg-background">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border">
         <div className="flex items-center gap-3">
@@ -157,6 +177,14 @@ export function ChatWindow({
                 <Ban className="mr-2 h-4 w-4" />
                 Block visitor
               </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => setShowDeleteDialog(true)}
+                className="text-destructive focus:text-destructive"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete conversation
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -180,6 +208,29 @@ export function ChatWindow({
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {isBlocking ? "Blocking..." : "Block visitor"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete confirmation dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this conversation?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete this conversation and all its messages.
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConversation}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

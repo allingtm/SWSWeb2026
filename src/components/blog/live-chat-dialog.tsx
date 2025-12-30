@@ -102,7 +102,7 @@ export function LiveChatDialog({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ duration: 0.2 }}
-          className="relative bg-background w-full h-full sm:h-auto sm:max-h-[80vh] sm:max-w-md sm:rounded-xl shadow-2xl flex flex-col overflow-hidden"
+          className="relative bg-background w-full h-dvh sm:h-auto sm:max-h-[80dvh] sm:max-w-md sm:rounded-xl shadow-2xl flex flex-col overflow-hidden"
         >
           {/* Header */}
           <div className="relative p-4 border-b border-border bg-primary text-primary-foreground">
@@ -129,7 +129,7 @@ export function LiveChatDialog({
           </div>
 
           {/* Messages area */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-1 min-h-64 max-h-96">
+          <div className="flex-1 overflow-y-auto p-4 space-y-1 min-h-48 sm:min-h-64 sm:max-h-96">
             {isLoading ? (
               <div className="flex items-center justify-center h-full">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
