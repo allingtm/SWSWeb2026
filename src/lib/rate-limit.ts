@@ -131,7 +131,7 @@ export function rateLimitResponse(result: RateLimitResult): Response {
 
 // Pre-configured rate limits for common endpoints
 export const RATE_LIMITS = {
-  enquiry: { limit: 5, windowSeconds: 60 },           // 5 per minute
-  chatConversation: { limit: 3, windowSeconds: 60 },  // 3 per minute
+  enquiry: { limit: 1, windowSeconds: 600 },          // 1 per 10 minutes
+  chatConversation: { limit: 4, windowSeconds: 60 },  // 4 per minute
   chatCheckBlocked: { limit: 10, windowSeconds: 60 }, // 10 per minute
 } as const;
