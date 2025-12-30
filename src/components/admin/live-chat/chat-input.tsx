@@ -90,7 +90,7 @@ export function ChatInput({
         rows={1}
         className={cn(
           "flex-1 min-w-0 resize-none rounded-xl border border-input bg-background px-4 py-3",
-          "text-sm placeholder:text-muted-foreground",
+          "text-base sm:text-sm placeholder:text-muted-foreground",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
           "disabled:cursor-not-allowed disabled:opacity-50",
           "max-h-30"
