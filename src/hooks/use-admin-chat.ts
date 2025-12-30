@@ -37,6 +37,7 @@ interface UseAdminChatReturn {
   closeConversation: (conversationId: string) => Promise<void>;
   toggleOnline: () => Promise<void>;
   refreshConversations: () => Promise<void>;
+  clearActiveConversation: () => void;
 }
 
 export function useAdminChat(): UseAdminChatReturn {
