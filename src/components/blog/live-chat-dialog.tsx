@@ -105,10 +105,18 @@ export function LiveChatDialog({
           className="relative bg-background w-full h-full sm:h-auto sm:max-h-[80vh] sm:max-w-md sm:rounded-xl shadow-2xl flex flex-col overflow-hidden"
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-border bg-primary text-primary-foreground">
-            <div className="flex items-center gap-3">
+          <div className="relative p-4 border-b border-border bg-primary text-primary-foreground">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="absolute top-2 right-2 text-primary-foreground hover:bg-primary-foreground/20"
+            >
+              <X className="h-5 w-5" />
+            </Button>
+            <div className="flex items-center gap-3 pr-8">
               {/* Avatar */}
-              <div className="w-10 h-10 rounded-full bg-primary-foreground/20 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-primary-foreground/20 flex items-center justify-center border-2 border-primary-foreground/30">
                 <span className="text-lg">💬</span>
               </div>
               <div>
@@ -118,14 +126,6 @@ export function LiveChatDialog({
                 </p>
               </div>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onClose}
-              className="text-primary-foreground hover:bg-primary-foreground/20"
-            >
-              <X className="h-5 w-5" />
-            </Button>
           </div>
 
           {/* Messages area */}
