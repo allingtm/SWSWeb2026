@@ -7,6 +7,7 @@ import {
   CookieConsentProvider,
   CookieBanner,
 } from "@/components/cookies";
+import { AdminChatNotificationWrapper } from "@/components/admin/admin-chat-notification-wrapper";
 import { siteConfig } from "@/lib/seo/constants";
 import "./globals.css";
 
@@ -95,6 +96,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <CookieConsentProvider>
+            <AdminChatNotificationWrapper />
             {children}
             <CookieBanner />
           </CookieConsentProvider>

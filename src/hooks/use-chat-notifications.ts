@@ -11,7 +11,29 @@ interface UseChatNotificationsReturn {
 
 export function useChatNotifications(): UseChatNotificationsReturn {
   const [newChat, setNewChat] = useState<ChatConversation | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const faviconIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Check authentication status
+  useEffect(() => {
+    const supabase = createClient();
+
+    // Check current session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAuthenticated(!!session);
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   // Favicon flashing
   useEffect(() => {
@@ -39,8 +61,10 @@ export function useChatNotifications(): UseChatNotificationsReturn {
     }
   }, [newChat]);
 
-  // Subscribe to new conversations
+  // Subscribe to new conversations (only when authenticated)
   useEffect(() => {
+    if (!isAuthenticated) return;
+
     const supabase = createClient();
 
     const channel = supabase
@@ -57,12 +81,18 @@ export function useChatNotifications(): UseChatNotificationsReturn {
           setNewChat(conversation);
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        if (status === "SUBSCRIBED") {
+          console.log("Admin chat notifications: subscribed to new conversations");
+        } else if (status === "CHANNEL_ERROR") {
+          console.error("Admin chat notifications: subscription error");
+        }
+      });
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [isAuthenticated]);
 
   const dismissNotification = useCallback(() => {
     setNewChat(null);
