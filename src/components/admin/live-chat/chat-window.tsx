@@ -276,20 +276,18 @@ export function ChatWindow({
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
-      <ChatInput
-        onSend={onSendMessage}
-        onTyping={onTyping}
-        placeholder="Type a message..."
-        disabled={conversation.status !== "active"}
-      />
-
-      {/* Closed conversation notice */}
-      {conversation.status !== "active" && (
-        <div className="absolute bottom-20 left-0 right-0 px-4">
-          <div className="bg-muted text-center py-2 rounded-lg text-sm text-muted-foreground">
-            This conversation has been {conversation.status}
-          </div>
+      {/* Input or closed notice */}
+      {conversation.status === "active" ? (
+        <ChatInput
+          onSend={onSendMessage}
+          onTyping={onTyping}
+          placeholder="Type a message..."
+        />
+      ) : (
+        <div className="flex flex-col items-center justify-center py-6 text-center border-t border-border bg-muted/30">
+          <p className="text-sm text-muted-foreground">
+            This conversation has been {conversation.status}.
+          </p>
         </div>
       )}
     </div>
