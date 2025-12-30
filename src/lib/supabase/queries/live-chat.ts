@@ -33,7 +33,7 @@ export async function getConversations(): Promise<ChatConversationWithDetails[]>
       *,
       post:sws2026_blog_posts(id, title, slug)
     `)
-    .order("last_message_at", { ascending: false, nullsFirst: false })
+    .order("last_message_at", { ascending: false, nullsFirst: true })
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -61,10 +61,18 @@ export async function getConversations(): Promise<ChatConversationWithDetails[]>
         .eq("sender_type", "visitor")
         .eq("is_read", false);
 
+      // Check if admin has replied
+      const { count: adminMessageCount } = await supabase
+        .from("sws2026_chat_messages")
+        .select("*", { count: "exact", head: true })
+        .eq("conversation_id", conv.id)
+        .eq("sender_type", "admin");
+
       return {
         ...conv,
         last_message: lastMessage || null,
         unread_count: unreadCount || 0,
+        admin_has_replied: (adminMessageCount || 0) > 0,
       } as ChatConversationWithDetails;
     })
   );

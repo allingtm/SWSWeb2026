@@ -28,6 +28,7 @@ export interface ChatConversationWithDetails extends ChatConversation {
   } | null;
   last_message?: ChatMessage | null;
   unread_count?: number;
+  admin_has_replied?: boolean;
 }
 
 // Chat Message
