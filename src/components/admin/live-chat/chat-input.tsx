@@ -23,9 +23,17 @@ export function ChatInput({
   const [message, setMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Auto-resize textarea
+  // Auto-resize textarea (only on larger screens)
   useEffect(() => {
     if (textareaRef.current) {
+      // Skip auto-resize on mobile to prevent layout issues with keyboard
+      const isMobile = window.innerWidth < 640;
+      if (isMobile) {
+        textareaRef.current.style.height = "auto";
+        textareaRef.current.style.overflowY = "hidden";
+        return;
+      }
+
       textareaRef.current.style.height = "auto";
       const scrollHeight = textareaRef.current.scrollHeight;
       const maxHeight = 120;
