@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { getMessages, getConversationByVisitorId } from "@/lib/supabase/queries/live-chat";
 import type {
   ChatMessage,
   ChatConversation,
@@ -49,17 +48,18 @@ export function useLiveChat({
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const adminTypingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Fetch existing conversation for this visitor
+  // Fetch existing conversation for this visitor (via API route for RLS bypass)
   useEffect(() => {
     if (!visitorId) return;
 
     async function fetchConversation() {
       try {
-        const existingConversation = await getConversationByVisitorId(visitorId);
-        if (existingConversation) {
-          setConversation(existingConversation);
-          const msgs = await getMessages(existingConversation.id);
-          setMessages(msgs);
+        const response = await fetch(`/api/live-chat/visitor?visitor_id=${visitorId}`);
+        const result = await response.json();
+
+        if (response.ok && result.conversation) {
+          setConversation(result.conversation);
+          setMessages(result.messages || []);
         }
       } catch (err) {
         console.error("Error fetching conversation:", err);
@@ -72,7 +72,63 @@ export function useLiveChat({
     fetchConversation();
   }, [visitorId]);
 
-  // Subscribe to real-time updates when conversation exists
+  // Poll for new messages and conversation updates (RLS prevents postgres_changes for visitors)
+  useEffect(() => {
+    if (!conversation || !visitorId) return;
+
+    const pollInterval = setInterval(async () => {
+      try {
+        const response = await fetch(
+          `/api/live-chat/visitor?visitor_id=${visitorId}&conversation_id=${conversation.id}`
+        );
+        const result = await response.json();
+
+        if (response.ok && result.messages) {
+          setMessages((prev) => {
+            // Only update if there are new messages
+            if (result.messages.length !== prev.length) {
+              return result.messages;
+            }
+            // Check if last message is different
+            const lastNew = result.messages[result.messages.length - 1];
+            const lastPrev = prev[prev.length - 1];
+            if (lastNew?.id !== lastPrev?.id) {
+              return result.messages;
+            }
+            return prev;
+          });
+        }
+      } catch (err) {
+        console.error("Error polling messages:", err);
+      }
+    }, 2000); // Poll every 2 seconds
+
+    // Also poll for conversation status changes
+    const statusInterval = setInterval(async () => {
+      try {
+        const response = await fetch(`/api/live-chat/visitor?visitor_id=${visitorId}`);
+        const result = await response.json();
+
+        if (response.ok && result.conversation) {
+          setConversation((prev) => {
+            if (prev?.status !== result.conversation.status) {
+              return result.conversation;
+            }
+            return prev;
+          });
+        }
+      } catch (err) {
+        console.error("Error polling conversation:", err);
+      }
+    }, 5000); // Poll status every 5 seconds
+
+    return () => {
+      clearInterval(pollInterval);
+      clearInterval(statusInterval);
+    };
+  }, [conversation, visitorId]);
+
+  // Subscribe to broadcast events (typing indicators still work via broadcast)
   useEffect(() => {
     if (!conversation) return;
 
@@ -81,39 +137,7 @@ export function useLiveChat({
 
     const channel = supabase
       .channel(channelName)
-      // Listen for new messages
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "sws2026_chat_messages",
-          filter: `conversation_id=eq.${conversation.id}`,
-        },
-        (payload) => {
-          const newMessage = payload.new as ChatMessage;
-          setMessages((prev) => {
-            // Avoid duplicates
-            if (prev.some((m) => m.id === newMessage.id)) return prev;
-            return [...prev, newMessage];
-          });
-        }
-      )
-      // Listen for conversation status changes (e.g., when admin closes chat)
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "sws2026_chat_conversations",
-          filter: `id=eq.${conversation.id}`,
-        },
-        (payload) => {
-          const updated = payload.new as ChatConversation;
-          setConversation(updated);
-        }
-      )
-      // Listen for admin typing
+      // Listen for admin typing (broadcast doesn't require RLS)
       .on("broadcast", { event: "admin-typing" }, (payload) => {
         const typingPayload = payload.payload as AdminTypingPayload;
         setAdminTyping({ isTyping: typingPayload.typing });
