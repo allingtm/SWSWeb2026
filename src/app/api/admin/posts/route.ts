@@ -50,8 +50,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create the post
-    const { post, error } = await createPost(postData);
+    // Create the post (pass authenticated client to preserve RLS context)
+    const { post, error } = await createPost(postData, supabase);
 
     if (error || !post) {
       return NextResponse.json(

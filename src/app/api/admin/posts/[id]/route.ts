@@ -47,8 +47,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     const body = await request.json();
     const { tags, faqs, ...postData } = body;
 
-    // Update the post
-    const { post, error } = await updatePost({ id, ...postData });
+    // Update the post (pass authenticated client to preserve RLS context)
+    const { post, error } = await updatePost({ id, ...postData }, supabase);
 
     if (error || !post) {
       return NextResponse.json(
@@ -100,7 +100,8 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     }
 
     const { id } = await params;
-    const { success, error } = await deletePost(id);
+    // Pass authenticated client to preserve RLS context
+    const { success, error } = await deletePost(id, supabase);
 
     if (!success) {
       return NextResponse.json(

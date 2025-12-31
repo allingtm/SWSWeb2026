@@ -1,5 +1,6 @@
 import { createClient } from "../server";
 import type { BlogPost, BlogFaq } from "@/types";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 export interface CreatePostData {
   title: string;
@@ -48,9 +49,10 @@ export interface UpdatePostData extends Partial<CreatePostData> {
 }
 
 export async function createPost(
-  data: CreatePostData
+  data: CreatePostData,
+  supabaseClient?: SupabaseClient
 ): Promise<{ post: BlogPost | null; error: string | null }> {
-  const supabase = await createClient();
+  const supabase = supabaseClient || await createClient();
 
   // Calculate word count and read time if content provided
   if (data.content && !data.word_count) {
@@ -78,9 +80,10 @@ export async function createPost(
 }
 
 export async function updatePost(
-  data: UpdatePostData
+  data: UpdatePostData,
+  supabaseClient?: SupabaseClient
 ): Promise<{ post: BlogPost | null; error: string | null }> {
-  const supabase = await createClient();
+  const supabase = supabaseClient || await createClient();
   const { id, ...updateData } = data;
 
   // Calculate word count and read time if content provided
@@ -119,9 +122,10 @@ export async function updatePost(
 }
 
 export async function deletePost(
-  id: string
+  id: string,
+  supabaseClient?: SupabaseClient
 ): Promise<{ success: boolean; error: string | null }> {
-  const supabase = await createClient();
+  const supabase = supabaseClient || await createClient();
 
   const { error } = await supabase
     .from("sws2026_blog_posts")
