@@ -55,8 +55,8 @@ export default async function HomePage() {
 
   return (
     <>
-      <JsonLd data={organizationSchema} />
-      <JsonLd data={websiteSchema} />
+      <JsonLd data={organizationSchema} id="organization" />
+      <JsonLd data={websiteSchema} id="website" />
       <Header categories={navCategories} />
       <main className="min-h-screen">
         {/* Hero Section */}

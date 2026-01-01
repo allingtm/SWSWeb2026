@@ -82,8 +82,8 @@ export default async function SlugPage({ params }: PageProps) {
 
     return (
       <>
-        <JsonLd data={breadcrumbSchema} />
-        <JsonLd data={collectionSchema} />
+        <JsonLd data={breadcrumbSchema} id={`breadcrumb-${slug}`} />
+        <JsonLd data={collectionSchema} id={`collection-${slug}`} />
         <Header categories={navCategories} />
         <main className="min-h-screen">
           <CategoryListing category={category} posts={posts} allCategories={navCategories} />
@@ -107,9 +107,9 @@ export default async function SlugPage({ params }: PageProps) {
 
     return (
       <>
-        <JsonLd data={breadcrumbSchema} />
-        <JsonLd data={articleSchema} />
-        {faqSchema && <JsonLd data={faqSchema} />}
+        <JsonLd data={breadcrumbSchema} id={`breadcrumb-${slug}`} />
+        <JsonLd data={articleSchema} id={`article-${slug}`} />
+        {faqSchema && <JsonLd data={faqSchema} id={`faq-${slug}`} />}
         <Header categories={navCategories} />
         <main className="min-h-screen">
           <PostContent post={post} />

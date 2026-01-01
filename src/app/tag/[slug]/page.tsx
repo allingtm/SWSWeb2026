@@ -61,7 +61,7 @@ export default async function TagPage({ params }: PageProps) {
 
   return (
     <>
-      <JsonLd data={breadcrumbSchema} />
+      <JsonLd data={breadcrumbSchema} id={`breadcrumb-tag-${slug}`} />
       <Header categories={navCategories} />
       <main className="min-h-screen">
         <TagListing tag={tag} posts={posts} />

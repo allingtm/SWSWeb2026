@@ -21,7 +21,7 @@ export default async function ContactPage() {
 
   return (
     <>
-      <JsonLd data={localBusinessSchema} />
+      <JsonLd data={localBusinessSchema} id="local-business" />
       <Header categories={navCategories} />
       <main className="min-h-screen py-12">
         <Container className="max-w-4xl">
