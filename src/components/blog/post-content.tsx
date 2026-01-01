@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
@@ -69,10 +69,11 @@ function extractHeadings(markdown: string): Heading[] {
   return headings;
 }
 
-function TableOfContents({ headings }: { headings: Heading[] }) {
+function TableOfContents({ headings, contentEndRef }: { headings: Heading[]; contentEndRef: React.RefObject<HTMLDivElement | null> }) {
   const [hovered, setHovered] = useState<number | null>(null);
   const [open, setOpen] = useState(false);
   const [activeId, setActiveId] = useState<string>("");
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
     if (headings.length === 0) return;
@@ -103,38 +104,63 @@ function TableOfContents({ headings }: { headings: Heading[] }) {
     return () => observer.disconnect();
   }, [headings]);
 
+  // Track when content area ends to hide TOC
+  useEffect(() => {
+    if (!contentEndRef.current) return;
+
+    const handleScroll = () => {
+      const marker = contentEndRef.current;
+      if (!marker) return;
+
+      const markerRect = marker.getBoundingClientRect();
+      // Hide TOC when the marker is at or above the TOC's top position (160px from top)
+      setIsVisible(markerRect.top > 160);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll(); // Check initial state
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [contentEndRef]);
+
   if (headings.length === 0) return null;
 
   return (
     <>
-      {/* Desktop TOC */}
-      <div className="sticky top-24 left-0 hidden max-w-xs flex-col self-start pr-10 md:flex max-h-[calc(100vh-8rem)] overflow-y-auto">
-        <p className="mb-4 text-sm font-semibold text-foreground">On this page</p>
-        {headings.map((heading, index) => {
-          const isActive = activeId === heading.href;
-          return (
-            <Link
-              className={`group/toc-link relative rounded-lg px-2 py-1 text-sm transition-colors ${
-                heading.level === 3 ? "pl-6" : ""
-              } ${isActive ? "text-primary font-medium" : "text-muted-foreground hover:text-foreground"}`}
-              key={`${heading.href}-${index}`}
-              href={heading.href}
-              onMouseEnter={() => setHovered(index)}
-              onMouseLeave={() => setHovered(null)}
-            >
-              {(hovered === index || isActive) && (
-                <motion.span
-                  layoutId="toc-indicator"
-                  className="absolute top-0 left-0 h-full w-1 rounded-tr-full rounded-br-full bg-primary"
-                />
-              )}
-              <span className="inline-block transition duration-200 group-hover/toc-link:translate-x-1">
-                {heading.title}
-              </span>
-            </Link>
-          );
-        })}
-      </div>
+      {/* Desktop TOC - uses position:fixed for reliable sticky behavior */}
+      <nav className="hidden md:block w-64 shrink-0">
+        <div
+          className={`fixed top-40 w-56 max-h-[calc(100vh-12rem)] overflow-y-auto pr-4 transition-opacity duration-300 ${
+            isVisible ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
+        >
+          <p className="mb-4 text-sm font-semibold text-foreground">On this page</p>
+          {headings.map((heading, index) => {
+            const isActive = activeId === heading.href;
+            return (
+              <Link
+                className={`group/toc-link relative block rounded-lg px-2 py-1 text-sm transition-colors ${
+                  heading.level === 3 ? "pl-6" : ""
+                } ${isActive ? "text-primary font-medium" : "text-muted-foreground hover:text-foreground"}`}
+                key={`${heading.href}-${index}`}
+                href={heading.href}
+                onMouseEnter={() => setHovered(index)}
+                onMouseLeave={() => setHovered(null)}
+              >
+                {(hovered === index || isActive) && (
+                  <motion.span
+                    layoutId="toc-indicator"
+                    className="absolute top-0 left-0 h-full w-1 rounded-tr-full rounded-br-full bg-primary"
+                  />
+                )}
+                <span className="inline-block transition duration-200 group-hover/toc-link:translate-x-1">
+                  {heading.title}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
 
       {/* Mobile TOC */}
       <div className="sticky top-20 right-2 flex w-full flex-col items-end justify-end self-start md:hidden z-40">
@@ -193,6 +219,7 @@ export function PostContent({ post }: PostContentProps) {
   const headings = extractHeadings(post.content);
   const [isEnquiryModalOpen, setIsEnquiryModalOpen] = useState(false);
   const { isAdminOnline, isBlocked, isLoading: isChatLoading } = useChatPresence();
+  const contentEndRef = useRef<HTMLDivElement>(null);
 
   // Check if post has an enquiry form configured
   const hasEnquiry = post.survey && post.enquiry_cta_title;
@@ -262,7 +289,7 @@ export function PostContent({ post }: PostContentProps) {
         {/* Main layout with TOC and Content */}
         <div className="flex flex-col md:flex-row gap-8">
           {/* TOC Sidebar */}
-          <TableOfContents headings={headings} />
+          <TableOfContents headings={headings} contentEndRef={contentEndRef} />
 
           {/* Main Content */}
           <div className="flex-1 max-w-3xl">
@@ -370,6 +397,9 @@ export function PostContent({ post }: PostContentProps) {
                 onOpenModal={() => setIsEnquiryModalOpen(true)}
               />
             )}
+
+            {/* Marker for TOC visibility - hides TOC when this enters viewport */}
+            <div ref={contentEndRef} aria-hidden="true" />
 
             {/* FAQs */}
             {post.faqs && post.faqs.length > 0 && (
