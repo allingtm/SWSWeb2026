@@ -48,7 +48,7 @@ export function FeaturedPosts({ posts }: FeaturedPostsProps) {
                 >
                   {mainPost.category.name}
                 </Badge>
-                <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight text-white mb-3 group-hover:text-blue-400 [text-shadow:0_0_0_transparent] group-hover:[text-shadow:-1px_-1px_0_#1e40af,1px_-1px_0_#1e40af,-1px_1px_0_#1e40af,1px_1px_0_#1e40af] transition-all duration-300">
+                <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight text-white mb-3 group-hover:text-blue-300 dark:group-hover:text-primary [text-shadow:0_0_0_transparent] group-hover:[text-shadow:-1px_-1px_0_#1e40af,1px_-1px_0_#1e40af,-1px_1px_0_#1e40af,1px_1px_0_#1e40af] transition-all duration-300">
                   {mainPost.title}
                 </h2>
                 {mainPost.excerpt && (
@@ -118,7 +118,7 @@ export function FeaturedPosts({ posts }: FeaturedPostsProps) {
                     >
                       {post.category.name}
                     </Badge>
-                    <h3 className="text-lg md:text-xl font-semibold text-white group-hover:text-blue-400 [text-shadow:0_0_0_transparent] group-hover:[text-shadow:-1px_-1px_0_#1e40af,1px_-1px_0_#1e40af,-1px_1px_0_#1e40af,1px_1px_0_#1e40af] transition-all duration-300 line-clamp-2">
+                    <h3 className="text-lg md:text-xl font-semibold text-white group-hover:text-blue-300 dark:group-hover:text-primary [text-shadow:0_0_0_transparent] group-hover:[text-shadow:-1px_-1px_0_#1e40af,1px_-1px_0_#1e40af,-1px_1px_0_#1e40af,1px_1px_0_#1e40af] transition-all duration-300 line-clamp-2">
                       {post.title}
                     </h3>
                     <div className="mt-2 flex items-center gap-2 text-xs text-white/70">
