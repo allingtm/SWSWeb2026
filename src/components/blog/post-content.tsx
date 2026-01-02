@@ -21,6 +21,7 @@ import { CalendlyBookingModal } from "./calendly-booking-modal";
 import { LiveChatProvider } from "./live-chat-context";
 import { useChatPresence } from "@/hooks/use-chat-presence";
 import type { BlogPostWithRelations } from "@/types";
+import { RelatedPosts } from "./related-posts";
 
 // Lazy-load live chat floating button
 const LiveChatFloatingButton = dynamic(
@@ -40,6 +41,7 @@ const EnquiryModal = dynamic(
 
 interface PostContentProps {
   post: BlogPostWithRelations;
+  relatedPosts?: BlogPostWithRelations[];
 }
 
 interface Heading {
@@ -215,7 +217,7 @@ function TableOfContents({ headings, contentEndRef }: { headings: Heading[]; con
   );
 }
 
-export function PostContent({ post }: PostContentProps) {
+export function PostContent({ post, relatedPosts }: PostContentProps) {
   const headings = extractHeadings(post.content);
   const [isEnquiryModalOpen, setIsEnquiryModalOpen] = useState(false);
   const { isAdminOnline, isBlocked, isLoading: isChatLoading } = useChatPresence();
@@ -478,6 +480,11 @@ export function PostContent({ post }: PostContentProps) {
                   </div>
                 </div>
               </section>
+            )}
+
+            {/* Related Posts */}
+            {relatedPosts && relatedPosts.length > 0 && (
+              <RelatedPosts category={post.category} posts={relatedPosts} />
             )}
           </div>
         </div>

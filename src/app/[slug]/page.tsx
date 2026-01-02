@@ -9,6 +9,7 @@ import {
   getCategoryBySlug,
   getPostBySlug,
   getPostsByCategorySlug,
+  getPostsByCategory,
 } from "@/lib/supabase/queries";
 import { generateMetadata as generateSiteMetadata } from "@/lib/seo/metadata";
 import {
@@ -96,6 +97,10 @@ export default async function SlugPage({ params }: PageProps) {
   // Check if it's a post
   const post = await getPostBySlug(slug);
   if (post) {
+    // Fetch related posts from the same category (excluding current post)
+    const categoryPosts = await getPostsByCategory(post.category.id, 11);
+    const relatedPosts = categoryPosts.filter(p => p.id !== post.id).slice(0, 10);
+
     const breadcrumbSchema = generateBreadcrumbSchema([
       { name: "Home", url: siteConfig.url },
       { name: post.category.name, url: `${siteConfig.url}/${post.category.slug}` },
@@ -112,7 +117,7 @@ export default async function SlugPage({ params }: PageProps) {
         {faqSchema && <JsonLd data={faqSchema} id={`faq-${slug}`} />}
         <Header categories={navCategories} />
         <main className="min-h-screen">
-          <PostContent post={post} />
+          <PostContent post={post} relatedPosts={relatedPosts} />
         </main>
         <Footer categories={navCategories} />
       </>
