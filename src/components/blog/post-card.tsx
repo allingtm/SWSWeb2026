@@ -94,7 +94,7 @@ export function PostCard({ post, featured = false }: PostCardProps) {
           )}
 
           <h3
-            className={`font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 ${
+            className={`font-semibold text-foreground group-hover:text-blue-400 [text-shadow:0_0_0_transparent] group-hover:[text-shadow:-1px_-1px_0_#1e40af,1px_-1px_0_#1e40af,-1px_1px_0_#1e40af,1px_1px_0_#1e40af] transition-all duration-300 line-clamp-2 ${
               featured ? "text-xl md:text-2xl" : "text-lg md:text-xl"
             }`}
           >
