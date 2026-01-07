@@ -1,14 +1,15 @@
 "use client";
 
-import React from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, User } from "lucide-react";
+import { X, User, Settings } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { createClient } from "@/lib/supabase/client";
 import type { BlogCategory } from "@/types";
 
 interface MobileMenuProps {
@@ -19,6 +20,21 @@ interface MobileMenuProps {
 
 export function MobileMenu({ isOpen, onClose, categories }: MobileMenuProps) {
   const pathname = usePathname();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const supabase = createClient();
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   return (
     <AnimatePresence>
@@ -118,19 +134,35 @@ export function MobileMenu({ isOpen, onClose, categories }: MobileMenuProps) {
                     <span className="text-base font-medium text-foreground">Theme</span>
                     <ThemeToggle />
                   </div>
-                  <Link
-                    href="/login"
-                    className={cn(
-                      "flex items-center gap-3 rounded-lg px-3 py-2 text-base font-medium",
-                      pathname === "/login"
-                        ? "bg-primary/10 text-primary"
-                        : "text-foreground hover:bg-muted"
-                    )}
-                    onClick={onClose}
-                  >
-                    <User className="h-5 w-5" />
-                    Login
-                  </Link>
+                  {isLoggedIn ? (
+                    <Link
+                      href="/admin"
+                      className={cn(
+                        "flex items-center gap-3 rounded-lg px-3 py-2 text-base font-medium",
+                        pathname.startsWith("/admin")
+                          ? "bg-primary/10 text-primary"
+                          : "text-foreground hover:bg-muted"
+                      )}
+                      onClick={onClose}
+                    >
+                      <Settings className="h-5 w-5" />
+                      Admin
+                    </Link>
+                  ) : (
+                    <Link
+                      href="/login"
+                      className={cn(
+                        "flex items-center gap-3 rounded-lg px-3 py-2 text-base font-medium",
+                        pathname === "/login"
+                          ? "bg-primary/10 text-primary"
+                          : "text-foreground hover:bg-muted"
+                      )}
+                      onClick={onClose}
+                    >
+                      <User className="h-5 w-5" />
+                      Login
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>

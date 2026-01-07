@@ -216,15 +216,25 @@ export function generateLocalBusinessSchema() {
     image: siteConfig.ogImage,
     address: {
       "@type": "PostalAddress",
+      streetAddress: "North Colchester Business Centre, 340 The Crescent",
       addressLocality: "Colchester",
       addressRegion: "Essex",
+      postalCode: "CO4 9AD",
       addressCountry: "GB",
     },
     geo: {
       "@type": "GeoCoordinates",
-      latitude: 51.922665,
-      longitude: 0.928908,
+      latitude: 51.9227,
+      longitude: 0.9041,
     },
+    openingHoursSpecification: [
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        opens: "09:00",
+        closes: "18:00",
+      },
+    ],
     areaServed: [
       {
         "@type": "Country",

@@ -190,3 +190,15 @@ export interface EnquiryWithRelations extends Enquiry {
   survey: Survey;
   post: BlogPost | null;
 }
+
+// Re-export content planner types
+export type {
+  ContentPlannerInput,
+  BriefAnalysis,
+  KeywordResearch,
+  AudienceAnalysis,
+  CompetitiveAnalysis,
+  SourcesResearch,
+  HelpSheetOutline,
+  AuthorHelpSheet,
+} from './content-planner';

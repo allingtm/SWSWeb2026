@@ -13,6 +13,7 @@ export function useChatNotifications(): UseChatNotificationsReturn {
   const [newChat, setNewChat] = useState<ChatConversation | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const faviconIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const channelIdRef = useRef(`admin-chat-notifications-${Date.now()}`);
 
   // Check authentication status
   useEffect(() => {
@@ -63,12 +64,25 @@ export function useChatNotifications(): UseChatNotificationsReturn {
 
   // Subscribe to new conversations (only when authenticated)
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated) {
+      console.log("Admin chat notifications: skipping subscription - not authenticated");
+      return;
+    }
 
     const supabase = createClient();
 
+    // Log current auth state for debugging
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log("Admin chat notifications: auth state check", {
+        hasSession: !!session,
+        userId: session?.user?.id,
+        role: session?.user?.role,
+        expiresAt: session?.expires_at,
+      });
+    });
+
     const channel = supabase
-      .channel("admin-chat-notifications")
+      .channel(channelIdRef.current)
       .on(
         "postgres_changes",
         {
@@ -81,11 +95,16 @@ export function useChatNotifications(): UseChatNotificationsReturn {
           setNewChat(conversation);
         }
       )
-      .subscribe((status) => {
+      .subscribe((status, err) => {
         if (status === "SUBSCRIBED") {
           console.log("Admin chat notifications: subscribed to new conversations");
         } else if (status === "CHANNEL_ERROR") {
-          console.error("Admin chat notifications: subscription error");
+          console.error("Admin chat notifications: subscription error", {
+            error: err,
+            status,
+          });
+        } else {
+          console.log("Admin chat notifications: channel status", status);
         }
       });
 

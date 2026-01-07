@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FileText, FolderOpen, Tags, Image, X, ClipboardList, MessageSquare, MessageCircle } from "lucide-react";
+import { LayoutDashboard, FileText, FolderOpen, Tags, Image, X, ClipboardList, MessageSquare, MessageCircle, PenLine } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 const navigation = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
+  { name: "Content Planner", href: "/admin/content-planner", icon: PenLine },
   { name: "Posts", href: "/admin/posts", icon: FileText },
   { name: "Media", href: "/admin/media", icon: Image },
   { name: "Categories", href: "/admin/categories", icon: FolderOpen },
