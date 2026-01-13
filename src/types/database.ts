@@ -84,6 +84,8 @@ export interface BlogPost {
   calendly_scheduling_url: string | null;
   calendly_cta_title: string | null;
   calendly_cta_description: string | null;
+  // Lead article flag
+  is_lead_article: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -189,6 +191,24 @@ export interface Enquiry {
 export interface EnquiryWithRelations extends Enquiry {
   survey: Survey;
   post: BlogPost | null;
+}
+
+// Help Options for lead capture helper on homepage
+export interface HelpOption {
+  id: string;
+  text: string;
+  description: string | null;
+  post_id: string;
+  display_order: number;
+  is_active: boolean;
+  icon: string | null;
+  color: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface HelpOptionWithPost extends HelpOption {
+  post: Pick<BlogPost, 'id' | 'slug' | 'title'>;
 }
 
 // Re-export content planner types

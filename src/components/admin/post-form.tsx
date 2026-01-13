@@ -116,6 +116,9 @@ export function PostForm({ post, categories, tags, authorId }: PostFormProps) {
   const [selectedSurveyId, setSelectedSurveyId] = useState<string>(post?.survey_id || "");
   const [enquiryCTATitle, setEnquiryCTATitle] = useState(post?.enquiry_cta_title || "");
 
+  // Lead article state
+  const [isLeadArticle, setIsLeadArticle] = useState(post?.is_lead_article || false);
+
   // Calendly state
   const [calendlyEnabled, setCalendlyEnabled] = useState(post?.calendly_enabled || false);
   const [calendlyEventTypeUri, setCalendlyEventTypeUri] = useState(post?.calendly_event_type_uri || "");
@@ -380,6 +383,8 @@ export function PostForm({ post, categories, tags, authorId }: PostFormProps) {
       faqs: faqs.filter((f) => f.question.trim() && f.answer.trim()),
       survey_id: selectedSurveyId || null,
       enquiry_cta_title: enquiryCTATitle || null,
+      // Lead article
+      is_lead_article: isLeadArticle,
       // Calendly fields
       calendly_enabled: calendlyEnabled,
       calendly_event_type_uri: calendlyEventTypeUri || null,
@@ -1212,6 +1217,25 @@ export function PostForm({ post, categories, tags, authorId }: PostFormProps) {
                   )}
                 />
               </div>
+            )}
+
+            <div className="flex items-center gap-2">
+              <input
+                id="is_lead_article"
+                type="checkbox"
+                checked={isLeadArticle}
+                onChange={(e) => setIsLeadArticle(e.target.checked)}
+                className="rounded border-input"
+              />
+              <label htmlFor="is_lead_article" className="text-sm">
+                Lead article
+              </label>
+            </div>
+            {isLeadArticle && (
+              <p className="text-xs text-muted-foreground -mt-2">
+                Lead articles are hidden from all listings but accessible via direct URL.
+                Link them from Help Options on the homepage.
+              </p>
             )}
 
             <div className="flex flex-col gap-2 pt-4 border-t border-border">

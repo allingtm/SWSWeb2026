@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FileText, FolderOpen, Tags, Image, X, ClipboardList, MessageSquare, MessageCircle, PenLine } from "lucide-react";
+import { LayoutDashboard, FileText, FolderOpen, Tags, Image, X, ClipboardList, MessageSquare, MessageCircle, PenLine, HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -13,6 +13,7 @@ const navigation = [
   { name: "Media", href: "/admin/media", icon: Image },
   { name: "Categories", href: "/admin/categories", icon: FolderOpen },
   { name: "Tags", href: "/admin/tags", icon: Tags },
+  { name: "Help Options", href: "/admin/help-options", icon: HelpCircle },
   { name: "Surveys", href: "/admin/surveys", icon: ClipboardList },
   { name: "Enquiries", href: "/admin/enquiries", icon: MessageSquare },
   { name: "Live Chat", href: "/admin/live-chat", icon: MessageCircle },

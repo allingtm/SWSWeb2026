@@ -31,6 +31,7 @@ export async function getFeaturedPosts(limit: number = 3): Promise<BlogPostWithR
     .select(POST_SELECT)
     .eq('status', 'published')
     .eq('is_featured', true)
+    .eq('is_lead_article', false)
     .lte('published_at', new Date().toISOString())
     .order('featured_order', { ascending: true })
     .limit(limit);
@@ -50,6 +51,7 @@ export async function getLatestPosts(limit: number = 12, offset: number = 0): Pr
     .from('sws2026_blog_posts')
     .select(POST_SELECT)
     .eq('status', 'published')
+    .eq('is_lead_article', false)
     .lte('published_at', new Date().toISOString())
     .order('published_at', { ascending: false })
     .range(offset, offset + limit - 1);
@@ -70,6 +72,7 @@ export async function getPostsByCategory(categoryId: string, limit: number = 4):
     .select(POST_SELECT)
     .eq('status', 'published')
     .eq('category_id', categoryId)
+    .eq('is_lead_article', false)
     .lte('published_at', new Date().toISOString())
     .order('published_at', { ascending: false })
     .limit(limit);
@@ -99,6 +102,7 @@ export async function getPostsByCategorySlug(slug: string, limit: number = 12, o
     .select(POST_SELECT)
     .eq('status', 'published')
     .eq('category_id', category.id)
+    .eq('is_lead_article', false)
     .lte('published_at', new Date().toISOString())
     .order('published_at', { ascending: false })
     .range(offset, offset + limit - 1);
@@ -137,6 +141,7 @@ export async function getPostsByTagSlug(slug: string, limit: number = 12, offset
     .from('sws2026_blog_posts')
     .select(POST_SELECT)
     .eq('status', 'published')
+    .eq('is_lead_article', false)
     .in('id', postIds)
     .lte('published_at', new Date().toISOString())
     .order('published_at', { ascending: false })
@@ -188,6 +193,7 @@ export async function getRelatedPosts(postId: string, limit: number = 3): Promis
     .from('sws2026_blog_posts')
     .select(POST_SELECT)
     .eq('status', 'published')
+    .eq('is_lead_article', false)
     .in('id', ids)
     .lte('published_at', new Date().toISOString());
 
@@ -223,6 +229,7 @@ export async function getPostsCount(): Promise<number> {
     .from('sws2026_blog_posts')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'published')
+    .eq('is_lead_article', false)
     .lte('published_at', new Date().toISOString());
 
   if (error) {

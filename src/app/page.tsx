@@ -1,12 +1,14 @@
 import { Container } from "@/components/ui/container";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { Hero } from "@/components/layout/hero";
 import { JsonLd } from "@/components/seo/json-ld";
 import {
   FeaturedPosts,
   CategoryPills,
   LatestPosts,
   CategorySection,
+  LeadCaptureHelper,
 } from "@/components/blog";
 import {
   getNavCategories,
@@ -14,6 +16,7 @@ import {
   getHomepageCategories,
   getLatestPosts,
   getPostsByCategory,
+  getActiveHelpOptions,
 } from "@/lib/supabase/queries";
 import { generateMetadata as generateSiteMetadata } from "@/lib/seo/metadata";
 import {
@@ -32,11 +35,12 @@ export const revalidate = 60; // Revalidate every minute
 
 export default async function HomePage() {
   // Fetch all data in parallel
-  const [navCategories, featuredPosts, homepageCategories, latestPosts] = await Promise.all([
+  const [navCategories, featuredPosts, homepageCategories, latestPosts, helpOptions] = await Promise.all([
     getNavCategories(),
     getFeaturedPosts(3),
     getHomepageCategories(),
     getLatestPosts(6),
+    getActiveHelpOptions(),
   ]);
 
   // Fetch posts for each homepage category (6 posts each)
@@ -59,25 +63,25 @@ export default async function HomePage() {
       <JsonLd data={websiteSchema} id="website" />
       <Header categories={navCategories} />
       <main className="min-h-screen">
-        {/* Hero Section */}
-        <section className="pt-16 pb-8">
+        {/* Hero Section - Above the Fold */}
+        <Hero title={siteConfig.heroTitle} subtitle={siteConfig.heroSubtitle} />
+
+        {/* Lead Capture Helper */}
+        {helpOptions.length > 0 && (
+          <LeadCaptureHelper helpOptions={helpOptions} />
+        )}
+
+        {/* Featured Posts */}
+        <section className="py-8">
           <Container>
-            <div className="text-center mb-12">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4">
-                {siteConfig.heroTitle}
-              </h1>
-              <p className="text-muted-foreground text-lg lg:text-xl max-w-2xl mx-auto">
-                {siteConfig.heroSubtitle}
-              </p>
-            </div>
-
-            {/* Category Pills */}
-            <div className="mb-12">
-              <CategoryPills categories={navCategories} />
-            </div>
-
-            {/* Featured Posts */}
             <FeaturedPosts posts={featuredPosts} />
+          </Container>
+        </section>
+
+        {/* Category Pills - Above Latest */}
+        <section className="py-8">
+          <Container>
+            <CategoryPills categories={navCategories} />
           </Container>
         </section>
 

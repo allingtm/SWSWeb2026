@@ -2,7 +2,7 @@ export const siteConfig = {
   name: "Solve With Software",
   tagline: "Insights on Software Development, AI, and Digital Transformation",
   heroTitle: "Your Developer. Your Project.",
-  heroSubtitle: "From idea to launch, together.",
+  heroSubtitle: "From idea to launch, together. Working with us is like having your own expert development team that cares about your success as much as you do.",
   description:
     "Expert insights on software development, AI, automation, and digital transformation. Practical advice for businesses navigating technology decisions.",
   url: "https://www.solvewithsoftware.com",
