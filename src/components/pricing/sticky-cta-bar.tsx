@@ -48,11 +48,20 @@ export function StickyCtaBar() {
       )}
     >
       <div className="flex items-center gap-3 px-4 py-3">
-        <p className="text-sm font-medium tabular-nums">
-          Diagnostic £950{" "}
-          <span className="font-normal text-muted-foreground">ex VAT</span>
-        </p>
-        <PricingCta position="sticky" size="default" className="ml-auto" />
+        <div className="min-w-0">
+          <p className="text-sm font-medium tabular-nums">
+            Diagnostic £950{" "}
+            <span className="font-normal text-muted-foreground">ex VAT</span>
+          </p>
+          {/* Short by necessity — the bar has room for one line beside the
+              button at 375px. The full "not a payment" line lives on /pricing. */}
+          <p className="text-xs text-muted-foreground">A call, not a payment</p>
+        </div>
+        <PricingCta
+          position="sticky"
+          size="default"
+          className="ml-auto shrink-0"
+        />
         <button
           type="button"
           onClick={() => setDismissed(true)}
