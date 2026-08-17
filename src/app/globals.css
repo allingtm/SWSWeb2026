@@ -8,7 +8,9 @@
   --muted-foreground: #737373;
   --card: #ffffff;
   --card-foreground: #0a0a0a;
-  --primary: #3b82f6;
+  /* #2563eb on white = 5.17:1 — WCAG AA for the 14px button label
+     (#3b82f6 was 3.68:1, below the required 4.5:1) */
+  --primary: #2563eb;
   --primary-foreground: #ffffff;
   --secondary: #f5f5f5;
   --secondary-foreground: #0a0a0a;
@@ -27,8 +29,11 @@
   --muted-foreground: #a3a3a3;
   --card: #0a0a0a;
   --card-foreground: #fafafa;
+  /* Dark keeps the lighter blue so text-primary stays 5.4:1 on near-black;
+     the button label goes dark instead (#0a0a0a on #3b82f6 = 5.4:1).
+     White-on-#3b82f6 (3.68:1) and #2563eb-on-black (3.8:1) both fail AA. */
   --primary: #3b82f6;
-  --primary-foreground: #ffffff;
+  --primary-foreground: #0a0a0a;
   --secondary: #262626;
   --secondary-foreground: #fafafa;
   --accent: #262626;
