@@ -139,6 +139,8 @@ export interface ContactSubmission {
   phone: string | null;
   message: string;
   status: 'new' | 'read' | 'replied' | 'archived';
+  source_url: string | null;
+  user_agent: string | null;
   created_at: string;
 }
 

@@ -52,11 +52,11 @@ export async function POST(request: NextRequest) {
 
     if (dbError) {
       console.error("Database error:", dbError);
-      // Don't fail the request if DB insert fails - we can still send email
+      // Not fatal on its own - the email below still reaches us.
     }
 
     // Send email notification
-    await sendEmail({
+    const emailSent = await sendEmail({
       to: process.env.CONTACT_EMAIL || "hello@solvewithsoftware.com",
       subject: `New Contact: ${body.name}${body.company ? ` from ${body.company}` : ""}`,
       html: `
@@ -68,6 +68,15 @@ export async function POST(request: NextRequest) {
         <p>${body.message.replace(/\n/g, "<br>")}</p>
       `,
     });
+
+    // Either path alone is enough to reach us, but if both failed the enquiry
+    // is lost - say so rather than showing a thank-you for nothing.
+    if (dbError && !emailSent) {
+      return NextResponse.json(
+        { error: "We couldn't send your message. Please email us directly." },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {
