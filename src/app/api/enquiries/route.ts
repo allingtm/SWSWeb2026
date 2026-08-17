@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSurveyById } from "@/lib/supabase/queries/surveys";
+import { sendEmail } from "@/lib/email";
 import {
   checkRateLimit,
   getClientIP,
@@ -99,31 +100,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Send email notification
-    if (process.env.RESEND_API_KEY) {
-      try {
-        const { Resend } = await import("resend");
-        const resend = new Resend(process.env.RESEND_API_KEY);
-
-        const emailHtml = generateEnquiryEmailHtml({
-          surveyName: survey.name,
-          postTitle,
-          responseData,
-          respondentEmail,
-          respondentName,
-          submittedAt: enquiry.created_at,
-        });
-
-        await resend.emails.send({
-          from: "website@solvewithsoftware.com",
-          to: process.env.ENQUIRY_EMAIL || process.env.CONTACT_EMAIL || "hello@solvewithsoftware.com",
-          subject: `New Enquiry: ${survey.name}${postTitle ? ` - ${postTitle}` : ""}`,
-          html: emailHtml,
-        });
-      } catch (emailError) {
-        console.error("Email error:", emailError);
-        // Don't fail the request if email fails
-      }
-    }
+    await sendEmail({
+      to: process.env.ENQUIRY_EMAIL || process.env.CONTACT_EMAIL || "hello@solvewithsoftware.com",
+      subject: `New Enquiry: ${survey.name}${postTitle ? ` - ${postTitle}` : ""}`,
+      html: generateEnquiryEmailHtml({
+        surveyName: survey.name,
+        postTitle,
+        responseData,
+        respondentEmail,
+        respondentName,
+        submittedAt: enquiry.created_at,
+      }),
+    });
 
     return NextResponse.json({ success: true, id: enquiry.id });
   } catch (error) {

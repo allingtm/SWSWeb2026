@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getCalendlyClient, isCalendlyConfigured } from "@/lib/calendly";
+import { sendEmail } from "@/lib/email";
 
 interface BookingRequest {
   post_id?: string;
@@ -84,24 +85,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Send email notification
-    if (process.env.RESEND_API_KEY) {
-      try {
-        const { Resend } = await import("resend");
-        const resend = new Resend(process.env.RESEND_API_KEY);
-
-        await resend.emails.send({
-          from: "website@solvewithsoftware.com",
-          to:
-            process.env.CALENDLY_NOTIFICATION_EMAIL ||
-            process.env.CONTACT_EMAIL ||
-            "hello@solvewithsoftware.com",
-          subject: `New Calendly Booking Request: ${body.name}`,
-          html: generateBookingNotificationEmail(body, eventType.name),
-        });
-      } catch (emailError) {
-        console.error("Email notification error:", emailError);
-      }
-    }
+    await sendEmail({
+      to:
+        process.env.CALENDLY_NOTIFICATION_EMAIL ||
+        process.env.CONTACT_EMAIL ||
+        "hello@solvewithsoftware.com",
+      subject: `New Calendly Booking Request: ${body.name}`,
+      html: generateBookingNotificationEmail(body, eventType.name),
+    });
 
     return NextResponse.json({
       success: true,
