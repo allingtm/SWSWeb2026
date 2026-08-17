@@ -53,6 +53,7 @@ const ladder = [
     duration: "Ongoing",
     price: "18%",
     pricePeriod: "of build cost, per year",
+    priceNote: "On a £13,500 build, that's about £200 a month.",
     description:
       "Support, hosting, small changes and priority access. Sold as part of phase one.",
   },
@@ -127,7 +128,7 @@ const faqs = [
     id: "faq-diagnostic-charge",
     question: "Why is there a charge for the diagnostic?",
     answer:
-      "Because it's real work, and it produces something you keep: a specification and a fixed quote you can take to any developer. Free quotes are priced into somebody's rate somewhere.",
+      "Because it's real work, and it produces something you keep: a specification and a fixed quote you can take to any developer. It costs a fraction of the build it prices, and it's the only honest way to give you a fixed number instead of a range. Free quotes are priced into somebody's rate somewhere.",
   },
   {
     id: "faq-general-cost",
@@ -289,7 +290,10 @@ export default async function PricingPage() {
             </p>
             <div className="mt-10 text-center print:hidden">
               <PricingCta position="ladder" />
-              <p className="mt-3 text-sm text-muted-foreground">
+              <p className="mt-3 text-sm text-foreground">
+                The next step is a short call, not a payment.
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
                 £950 ex VAT &middot; on site with you &middot; the spec is yours
                 to keep
               </p>
@@ -396,7 +400,10 @@ export default async function PricingPage() {
             </p>
             <div className="print:hidden">
               <PricingCta position="closing" />
-              <p className="mt-4">
+              <p className="mt-3 text-sm text-foreground">
+                The next step is a short call, not a payment.
+              </p>
+              <p className="mt-2">
                 <a
                   href={phoneHref}
                   className="text-sm text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
