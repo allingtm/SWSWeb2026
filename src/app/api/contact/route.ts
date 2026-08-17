@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { sendEmail } from "@/lib/email";
 
 interface ContactFormData {
   name: string;
@@ -54,30 +55,19 @@ export async function POST(request: NextRequest) {
       // Don't fail the request if DB insert fails - we can still send email
     }
 
-    // Send email notification (if Resend is configured)
-    if (process.env.RESEND_API_KEY) {
-      try {
-        const { Resend } = await import("resend");
-        const resend = new Resend(process.env.RESEND_API_KEY);
-
-        await resend.emails.send({
-          from: "website@solvewithsoftware.com",
-          to: process.env.CONTACT_EMAIL || "hello@solvewithsoftware.com",
-          subject: `New Contact: ${body.name}${body.company ? ` from ${body.company}` : ""}`,
-          html: `
-            <h2>New Contact Form Submission</h2>
-            <p><strong>Name:</strong> ${body.name}</p>
-            <p><strong>Email:</strong> ${body.email}</p>
-            ${body.company ? `<p><strong>Company:</strong> ${body.company}</p>` : ""}
-            <h3>Message</h3>
-            <p>${body.message.replace(/\n/g, "<br>")}</p>
-          `,
-        });
-      } catch (emailError) {
-        console.error("Email error:", emailError);
-        // Don't fail the request if email fails
-      }
-    }
+    // Send email notification
+    await sendEmail({
+      to: process.env.CONTACT_EMAIL || "hello@solvewithsoftware.com",
+      subject: `New Contact: ${body.name}${body.company ? ` from ${body.company}` : ""}`,
+      html: `
+        <h2>New Contact Form Submission</h2>
+        <p><strong>Name:</strong> ${body.name}</p>
+        <p><strong>Email:</strong> ${body.email}</p>
+        ${body.company ? `<p><strong>Company:</strong> ${body.company}</p>` : ""}
+        <h3>Message</h3>
+        <p>${body.message.replace(/\n/g, "<br>")}</p>
+      `,
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {

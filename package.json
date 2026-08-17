@@ -38,7 +38,6 @@
     "react-markdown": "^10.1.0",
     "rehype-slug": "^6.0.0",
     "remark-gfm": "^4.0.1",
-    "resend": "^6.6.0",
     "survey-core": "^2.5.3",
     "survey-react-ui": "^2.5.3",
     "tailwind-merge": "^3.4.0",

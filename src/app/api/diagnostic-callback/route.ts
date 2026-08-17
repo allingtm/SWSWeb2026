@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/service";
+import { sendEmail } from "@/lib/email";
 
 interface CallbackFormData {
   name: string;
@@ -47,31 +48,18 @@ export async function POST(request: NextRequest) {
       // Don't fail the request if DB insert fails - we can still send email
     }
 
-    // Send email notification (if Resend is configured)
-    let emailSent = false;
-    if (process.env.RESEND_API_KEY) {
-      try {
-        const { Resend } = await import("resend");
-        const resend = new Resend(process.env.RESEND_API_KEY);
-
-        await resend.emails.send({
-          from: "website@solvewithsoftware.com",
-          to: "marc@solvewithsoftware.com",
-          subject: `Diagnostic callback request: ${body.name}${body.company ? ` from ${body.company}` : ""}`,
-          html: `
-            <h2>Diagnostic Callback Request</h2>
-            <p><strong>Name:</strong> ${body.name}</p>
-            ${body.company ? `<p><strong>Company:</strong> ${body.company}</p>` : ""}
-            <p><strong>Phone:</strong> ${body.phone}</p>
-            ${body.bestTime ? `<p><strong>Best time to call:</strong> ${body.bestTime}</p>` : ""}
-          `,
-        });
-        emailSent = true;
-      } catch (emailError) {
-        console.error("Email error:", emailError);
-        // Don't fail the request if email fails
-      }
-    }
+    // Send email notification
+    const emailSent = await sendEmail({
+      to: "marc@solvewithsoftware.com",
+      subject: `Diagnostic callback request: ${body.name}${body.company ? ` from ${body.company}` : ""}`,
+      html: `
+        <h2>Diagnostic Callback Request</h2>
+        <p><strong>Name:</strong> ${body.name}</p>
+        ${body.company ? `<p><strong>Company:</strong> ${body.company}</p>` : ""}
+        <p><strong>Phone:</strong> ${body.phone}</p>
+        ${body.bestTime ? `<p><strong>Best time to call:</strong> ${body.bestTime}</p>` : ""}
+      `,
+    });
 
     // Either path alone is enough to reach us (admin list or inbox), but if both
     // failed the lead is lost - tell the visitor so they can call or retry.
