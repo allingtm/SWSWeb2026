@@ -1,16 +1,19 @@
 import Link from "next/link";
-import { FileText, FolderOpen, Tags, Plus, Eye } from "lucide-react";
+import { FileText, FolderOpen, Tags, Plus, Eye, PhoneCall } from "lucide-react";
 import { getPostCounts, getRecentPosts, getAllCategories, getAllTags } from "@/lib/supabase/queries/admin";
+import { getNewDiagnosticCallbackCount } from "@/lib/supabase/queries/diagnostic-callbacks";
 import { ButtonLink } from "@/components/ui/button-link";
 import { StatusBadge } from "@/components/admin/status-badge";
 
 export default async function AdminDashboardPage() {
-  const [postCounts, recentPosts, categories, tags] = await Promise.all([
-    getPostCounts(),
-    getRecentPosts(5),
-    getAllCategories(),
-    getAllTags(),
-  ]);
+  const [postCounts, recentPosts, categories, tags, newCallbacks] =
+    await Promise.all([
+      getPostCounts(),
+      getRecentPosts(5),
+      getAllCategories(),
+      getAllTags(),
+      getNewDiagnosticCallbackCount(),
+    ]);
 
   const stats = [
     {
@@ -37,6 +40,13 @@ export default async function AdminDashboardPage() {
       icon: Tags,
       href: "/admin/tags",
     },
+    {
+      name: "New Callbacks",
+      value: newCallbacks,
+      icon: PhoneCall,
+      href: "/admin/diagnostic-callbacks?status=new",
+      highlight: newCallbacks > 0,
+    },
   ];
 
   return (
@@ -50,21 +60,43 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         {stats.map((stat) => {
           const Icon = stat.icon;
+          // Waiting callbacks are a lead going cold, so they get picked out.
+          const highlight = "highlight" in stat && stat.highlight;
           return (
             <Link
               key={stat.name}
               href={stat.href}
-              className="bg-background rounded-lg border border-border p-4 hover:border-primary/50 transition-colors"
+              className={`rounded-lg border p-4 transition-colors ${
+                highlight
+                  ? "bg-blue-50 border-blue-300 hover:border-blue-500 dark:bg-blue-950/30 dark:border-blue-800"
+                  : "bg-background border-border hover:border-primary/50"
+              }`}
             >
               <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10">
-                  <Icon className="h-5 w-5 text-primary" />
+                <div
+                  className={`flex items-center justify-center w-10 h-10 rounded-lg ${
+                    highlight ? "bg-blue-600/15" : "bg-primary/10"
+                  }`}
+                >
+                  <Icon
+                    className={`h-5 w-5 ${
+                      highlight
+                        ? "text-blue-600 dark:text-blue-400"
+                        : "text-primary"
+                    }`}
+                  />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">
+                  <p
+                    className={`text-2xl font-bold ${
+                      highlight
+                        ? "text-blue-700 dark:text-blue-400"
+                        : "text-foreground"
+                    }`}
+                  >
                     {stat.value}
                   </p>
                   <p className="text-sm text-muted-foreground">{stat.name}</p>

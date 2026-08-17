@@ -2,11 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FileText, FolderOpen, Tags, Image, X, ClipboardList, MessageSquare, MessageCircle, PenLine, HelpCircle } from "lucide-react";
+import { LayoutDashboard, FileText, FolderOpen, Tags, Image, X, ClipboardList, MessageSquare, MessageCircle, PenLine, HelpCircle, PhoneCall } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useNewCallbackCount } from "@/hooks/use-new-callback-count";
 
-const navigation = [
+// `badge` names a live count to show alongside the item.
+const navigation: {
+  name: string;
+  href: string;
+  icon: typeof LayoutDashboard;
+  badge?: "newCallbacks";
+}[] = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { name: "Content Planner", href: "/admin/content-planner", icon: PenLine },
   { name: "Posts", href: "/admin/posts", icon: FileText },
@@ -16,6 +23,7 @@ const navigation = [
   { name: "Help Options", href: "/admin/help-options", icon: HelpCircle },
   { name: "Surveys", href: "/admin/surveys", icon: ClipboardList },
   { name: "Enquiries", href: "/admin/enquiries", icon: MessageSquare },
+  { name: "Diagnostic Callbacks", href: "/admin/diagnostic-callbacks", icon: PhoneCall, badge: "newCallbacks" },
   { name: "Live Chat", href: "/admin/live-chat", icon: MessageCircle },
 ];
 
@@ -26,6 +34,7 @@ interface AdminSidebarProps {
 
 export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const pathname = usePathname();
+  const newCallbackCount = useNewCallbackCount();
 
   const isActive = (href: string) => {
     if (href === "/admin") {
@@ -72,6 +81,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
             {navigation.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.href);
+              const badgeCount = item.badge === "newCallbacks" ? newCallbackCount : 0;
 
               return (
                 <Link
@@ -85,8 +95,21 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                       : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
                 >
-                  <Icon className="h-5 w-5" />
-                  {item.name}
+                  <Icon className="h-5 w-5 shrink-0" />
+                  <span className="flex-1">{item.name}</span>
+                  {badgeCount > 0 && (
+                    <span
+                      className={cn(
+                        "inline-flex min-w-5 items-center justify-center rounded-full px-1.5 py-0.5 text-xs font-semibold tabular-nums",
+                        active
+                          ? "bg-primary-foreground/20 text-primary-foreground"
+                          : "bg-blue-600 text-white"
+                      )}
+                      aria-label={`${badgeCount} new`}
+                    >
+                      {badgeCount}
+                    </span>
+                  )}
                 </Link>
               );
             })}

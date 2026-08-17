@@ -193,6 +193,23 @@ export interface EnquiryWithRelations extends Enquiry {
   post: BlogPost | null;
 }
 
+// Callback requests from the /book-diagnostic page. Separate from enquiries:
+// these are phone-first diagnostic bookings, not dynamic survey submissions.
+export type DiagnosticCallbackStatus = 'new' | 'contacted' | 'booked' | 'archived';
+
+export interface DiagnosticCallback {
+  id: string;
+  name: string;
+  company: string | null;
+  phone: string;
+  best_time: string | null;
+  status: DiagnosticCallbackStatus;
+  notes: string | null;
+  source_url: string | null;
+  user_agent: string | null;
+  created_at: string;
+}
+
 // Help Options for lead capture helper on homepage
 export interface HelpOption {
   id: string;

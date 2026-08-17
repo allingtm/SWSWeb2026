@@ -1,4 +1,5 @@
 import { createClient } from '../server';
+import { endOfDay } from './date-filters';
 import type { Enquiry, EnquiryWithRelations } from '@/types';
 
 const ENQUIRY_SELECT = `
@@ -39,7 +40,7 @@ export async function getAllEnquiries(options?: {
   }
 
   if (options?.dateTo) {
-    query = query.lte('created_at', options.dateTo);
+    query = query.lte('created_at', endOfDay(options.dateTo));
   }
 
   query = query.order('created_at', { ascending: false });

@@ -48,6 +48,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Send email notification (if Resend is configured)
+    let emailSent = false;
     if (process.env.RESEND_API_KEY) {
       try {
         const { Resend } = await import("resend");
@@ -65,10 +66,20 @@ export async function POST(request: NextRequest) {
             ${body.bestTime ? `<p><strong>Best time to call:</strong> ${body.bestTime}</p>` : ""}
           `,
         });
+        emailSent = true;
       } catch (emailError) {
         console.error("Email error:", emailError);
         // Don't fail the request if email fails
       }
+    }
+
+    // Either path alone is enough to reach us (admin list or inbox), but if both
+    // failed the lead is lost - tell the visitor so they can call or retry.
+    if (dbError && !emailSent) {
+      return NextResponse.json(
+        { error: "We couldn't save your request. Please call us instead." },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ success: true });
