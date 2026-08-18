@@ -9,3 +9,4 @@ export { CategoryListing } from './category-listing';
 export { TagListing } from './tag-listing';
 export { RelatedPosts } from './related-posts';
 export { LeadCaptureHelper } from './lead-capture-helper';
+export { LiveChatMount } from './live-chat-mount';

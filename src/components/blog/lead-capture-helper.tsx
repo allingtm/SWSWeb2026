@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { TrackedLink } from "@/components/ui/tracked-link";
 import { CardContainer, CardBody, CardItem } from "@/components/ui/3d-card";
 import { MovingBorder } from "@/components/ui/moving-border";
 import { Container } from "@/components/ui/container";
@@ -54,9 +54,11 @@ export function LeadCaptureHelper({
                     borderColor: option.color || undefined,
                   }}
                 >
-                  <Link
+                  <TrackedLink
                     href={`/${option.post.slug}`}
                     className="block px-6 py-4 md:px-8 md:py-5 text-center"
+                    event="help_option_click"
+                    eventProps={{ option: option.text, slug: option.post.slug }}
                   >
                     <CardItem
                       translateZ={40}
@@ -76,7 +78,7 @@ export function LeadCaptureHelper({
                         </span>
                       </CardItem>
                     )}
-                  </Link>
+                  </TrackedLink>
                 </CardBody>
               </CardContainer>
             ))}
