@@ -396,7 +396,7 @@ export default async function PricingPage() {
             <p className="mx-auto mb-8 max-w-2xl text-lg leading-relaxed text-muted-foreground">
               We come to you. You leave with your process mapped, a written
               specification, and a fixed price. £950, and the spec is yours
-              whether or not you work with us.
+              professionally completed and ready for you to approve before we start the work.
             </p>
             <div className="print:hidden">
               <PricingCta position="closing" />

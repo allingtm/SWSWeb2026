@@ -94,8 +94,7 @@ export default async function BookDiagnosticPage() {
                 </h1>
                 <p className="mt-5 max-w-xl text-lg leading-relaxed text-muted-foreground">
                   We come to you. You leave with your process mapped, a written
-                  specification, and a fixed price to build it - yours to keep
-                  whether or not we work together.
+                  specification, and a fixed price to build it. Ready for you to approve before we start the work.
                 </p>
 
                 <ul className="mt-10 space-y-6 border-t border-dashed border-border pt-8">
