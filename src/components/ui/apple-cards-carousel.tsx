@@ -302,7 +302,7 @@ export const Card = ({
         <div className="pointer-events-none absolute inset-x-0 top-0 z-30 h-full bg-gradient-to-b from-black/60 via-transparent to-black/40" />
         <div className="relative z-40 flex h-full w-full flex-col p-8">
           <motion.p
-            layoutId={layout ? `category-${card.category}` : undefined}
+            layoutId={layout ? `category-${card.title}` : undefined}
             className="text-left text-sm font-medium uppercase tracking-wider text-white md:text-base"
           >
             {card.category}
