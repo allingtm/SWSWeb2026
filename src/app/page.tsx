@@ -2,6 +2,7 @@ import { Container } from "@/components/ui/container";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Hero } from "@/components/layout/hero";
+import { TrackedButtonLink } from "@/components/ui/tracked-button-link";
 import { JsonLd } from "@/components/seo/json-ld";
 import {
   FeaturedPosts,
@@ -9,6 +10,7 @@ import {
   LatestPosts,
   CategorySection,
   LeadCaptureHelper,
+  LiveChatMount,
 } from "@/components/blog";
 import {
   getNavCategories,
@@ -64,7 +66,25 @@ export default async function HomePage() {
       <Header categories={navCategories} />
       <main className="min-h-screen">
         {/* Hero Section - Above the Fold */}
-        <Hero title={siteConfig.heroTitle} subtitle={siteConfig.heroSubtitle} />
+        <Hero title={siteConfig.heroTitle} subtitle={siteConfig.heroSubtitle}>
+          <TrackedButtonLink
+            href="/pricing"
+            size="lg"
+            event="home_cta_click"
+            eventProps={{ target: "pricing" }}
+          >
+            See what it costs
+          </TrackedButtonLink>
+          <TrackedButtonLink
+            href={`tel:${siteConfig.phone.replace(/-/g, "")}`}
+            variant="outline"
+            size="lg"
+            external
+            event="home_call_click"
+          >
+            Call {siteConfig.phone}
+          </TrackedButtonLink>
+        </Hero>
 
         {/* Lead Capture Helper */}
         {helpOptions.length > 0 && (
@@ -100,6 +120,8 @@ export default async function HomePage() {
         ))}
       </main>
       <Footer categories={navCategories} />
+      {/* Floating live chat button - only renders when an admin is online */}
+      <LiveChatMount />
     </>
   );
 }

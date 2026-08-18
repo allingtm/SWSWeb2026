@@ -2,7 +2,9 @@ import { Metadata } from "next";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Container } from "@/components/ui/container";
-import { ButtonLink } from "@/components/ui/button-link";
+import { TrackedButtonLink } from "@/components/ui/tracked-button-link";
+import { TrackedLink } from "@/components/ui/tracked-link";
+import { ProjectsCarousel } from "@/components/about/projects-carousel";
 import { getNavCategories } from "@/lib/supabase/queries";
 import { generateMetadata as generateSiteMetadata } from "@/lib/seo/metadata";
 import { siteConfig } from "@/lib/seo/constants";
@@ -74,8 +76,8 @@ export default async function AboutPage() {
               About Solve With Software
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              We are a software development consultancy dedicated to helping businesses
-              solve complex challenges through elegant, efficient technology solutions.
+                We deliver tailored business IT systems that meet your exact needs. Our team is dedicated to helping businesses
+              solve complex challenges through elegant, efficient and cost-effective technology solutions.
             </p>
           </Container>
         </section>
@@ -128,6 +130,20 @@ export default async function AboutPage() {
               ))}
             </div>
           </Container>
+        </section>
+
+        {/* Projects Section */}
+        <section className="py-16 overflow-hidden">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-4">
+              <h2 className="text-3xl font-bold mb-4">Where We Have Delivered</h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                Over a decade of projects across regulated, high-stakes sectors
+                where reliability and security are not optional.
+              </p>
+            </div>
+          </div>
+          <ProjectsCarousel />
         </section>
 
         {/* Expertise Section */}
@@ -217,18 +233,36 @@ export default async function AboutPage() {
               We would be delighted to learn about your requirements and explore how we can work together.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <ButtonLink href="/contact" size="lg">
-                Contact Us
-              </ButtonLink>
-              <ButtonLink
+              <TrackedButtonLink
+                href="/pricing"
+                size="lg"
+                event="about_cta_click"
+                eventProps={{ target: "pricing" }}
+              >
+                See what it costs
+              </TrackedButtonLink>
+              <TrackedButtonLink
                 href={`tel:${siteConfig.phone.replace(/-/g, "")}`}
                 variant="outline"
                 size="lg"
                 external
+                event="about_call_click"
               >
                 Call {siteConfig.phone}
-              </ButtonLink>
+              </TrackedButtonLink>
             </div>
+            <p className="mt-6 text-sm text-muted-foreground">
+              Not ready for that?{" "}
+              <TrackedLink
+                href="/contact"
+                className="text-primary underline-offset-4 hover:underline"
+                event="about_cta_click"
+                eventProps={{ target: "contact" }}
+              >
+                Send us a message
+              </TrackedLink>{" "}
+              and we will get back to you.
+            </p>
           </Container>
         </section>
       </main>

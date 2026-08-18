@@ -3,6 +3,7 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Container } from "@/components/ui/container";
 import { ContactForm } from "@/components/contact/contact-form";
+import { TrackedLink } from "@/components/ui/tracked-link";
 import { JsonLd } from "@/components/seo/json-ld";
 import { getNavCategories } from "@/lib/supabase/queries";
 import { generateMetadata as generateSiteMetadata } from "@/lib/seo/metadata";
@@ -46,51 +47,60 @@ export default async function ContactPage() {
             <div className="space-y-8">
               <div>
                 <h3 className="font-semibold mb-2">Email</h3>
-                <a
+                <TrackedLink
                   href={`mailto:${siteConfig.email}`}
                   className="text-primary hover:underline"
+                  external
+                  event="contact_channel_click"
+                  eventProps={{ channel: "email" }}
                 >
                   {siteConfig.email}
-                </a>
+                </TrackedLink>
               </div>
 
               <div>
                 <h3 className="font-semibold mb-2">Phone</h3>
-                <a
+                <TrackedLink
                   href={`tel:${siteConfig.phone.replace(/-/g, "")}`}
                   className="text-primary hover:underline"
+                  external
+                  event="contact_channel_click"
+                  eventProps={{ channel: "phone" }}
                 >
                   {siteConfig.phone}
-                </a>
+                </TrackedLink>
               </div>
 
               <div>
                 <h3 className="font-semibold mb-2">Follow Us</h3>
                 <div className="flex flex-col gap-2">
-                  <a
+                  <TrackedLink
                     href="https://www.linkedin.com/company/solvewithsoftware"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    external
                     className="text-muted-foreground hover:text-foreground transition-colors"
+                    event="contact_social_click"
+                    eventProps={{ network: "linkedin" }}
                   >
                     LinkedIn
-                  </a>
-                  <a
+                  </TrackedLink>
+                  <TrackedLink
                     href="https://twitter.com/solvewithsw"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    external
                     className="text-muted-foreground hover:text-foreground transition-colors"
+                    event="contact_social_click"
+                    eventProps={{ network: "twitter" }}
                   >
                     Twitter
-                  </a>
-                  <a
+                  </TrackedLink>
+                  <TrackedLink
                     href="https://github.com/solvewithsoftware"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    external
                     className="text-muted-foreground hover:text-foreground transition-colors"
+                    event="contact_social_click"
+                    eventProps={{ network: "github" }}
                   >
                     GitHub
-                  </a>
+                  </TrackedLink>
                 </div>
               </div>
             </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { track } from "@vercel/analytics";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -77,6 +78,7 @@ export function ContactForm() {
         throw new Error("Failed to submit form");
       }
 
+      track("contact_form_submit", { hasCompany: Boolean(formData.company.trim()) });
       setIsSubmitted(true);
       setFormData({ name: "", email: "", company: "", message: "" });
     } catch {

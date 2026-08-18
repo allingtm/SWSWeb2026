@@ -6,9 +6,11 @@ import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 interface HeroProps {
   title: string;
   subtitle: string;
+  /** Optional CTA row rendered below the subtitle. */
+  children?: React.ReactNode;
 }
 
-export function Hero({ title, subtitle }: HeroProps) {
+export function Hero({ title, subtitle, children }: HeroProps) {
   return (
     <section className="pt-16 pb-4">
       <Container>
@@ -21,6 +23,11 @@ export function Hero({ title, subtitle }: HeroProps) {
           <p className="text-muted-foreground text-lg lg:text-xl max-w-2xl mx-auto">
             {subtitle}
           </p>
+          {children && (
+            <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+              {children}
+            </div>
+          )}
         </div>
       </Container>
     </section>
