@@ -55,16 +55,6 @@ const projects: Project[] = [
     ],
   },
   {
-    category: "NHS",
-    title: "Patient-Facing Mental Health System",
-    description: "Award-winning patient-facing mental health system.",
-    detail:
-      "A patient-facing system used by people at genuinely difficult moments. Patient-facing NHS work carries requirements that internal tools never see: clinical safety, accessibility for people in distress, information governance, and a tolerance for downtime close to zero.",
-    gradient: "from-blue-700 via-blue-600 to-cyan-500",
-    icon: HeartPulse,
-    tags: ["Healthcare", "Patient-Facing", "Award-Winning"],
-  },
-  {
     category: "Finance",
     title: "Business Orchestration & Workflow",
     description:
@@ -104,6 +94,16 @@ const projects: Project[] = [
       "Haulage",
       "Reporting",
     ],
+  },
+  {
+    category: "NHS",
+    title: "Patient-Facing Mental Health System",
+    description: "Award-winning patient-facing mental health system.",
+    detail:
+      "A patient-facing system used by people at genuinely difficult moments. Patient-facing NHS work carries requirements that internal tools never see: clinical safety, accessibility for people in distress, information governance, and a tolerance for downtime close to zero.",
+    gradient: "from-blue-700 via-blue-600 to-cyan-500",
+    icon: HeartPulse,
+    tags: ["Healthcare", "Patient-Facing", "Award-Winning"],
   },
   {
     category: "Education",

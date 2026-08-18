@@ -7,8 +7,11 @@ import { cn } from "@/lib/utils";
 //  - Retinted from `bg-white`/`bg-black`/`neutral-*` to the site's tokens, since
 //    this project themes via CSS variables rather than a fixed palette.
 //  - Dropped `md:auto-rows-[18rem]`. That height is sized for cells carrying a
-//    decorative header image; ours carry text, so rows size to content instead
-//    and `auto-rows-fr` keeps them level across a row.
+//    decorative header image; ours carry text, so rows size to content instead.
+//    Note this rules out `auto-rows-fr` as well: equal-height rows means the
+//    row-spanning cell, which is the tallest thing in the grid, sets the height
+//    of every other row too, and short rows are left with dead space under
+//    their copy. Cells still stretch level within their own row by default.
 //  - Dropped the `header` slot entirely. It exists to hold a gradient or
 //    skeleton blob, and this section has to read as credible rather than
 //    decorated.
@@ -29,7 +32,7 @@ export function BentoGrid({
   return (
     <div
       className={cn(
-        "grid grid-cols-1 gap-6 md:auto-rows-fr md:grid-cols-3",
+        "grid grid-cols-1 gap-6 md:grid-cols-3",
         className
       )}
     >
@@ -51,9 +54,11 @@ export function BentoGridItem({
   description?: React.ReactNode;
   icon?: React.ReactNode;
   /**
-   * Pinned to the bottom of the cell with `mt-auto`. A cell that spans two rows
-   * is as tall as both cells beside it, so a single block of copy leaves a gap
-   * under it; a second block turns that gap into deliberate spacing.
+   * Sits in the lower middle of the cell. A cell that spans two rows is taller
+   * than its content, and the leftover height is split by the flex spacers
+   * around this block rather than collected in one place: pinning the footer
+   * to the bottom opened a dead band under the copy, and letting it follow the
+   * copy directly left the whole cell bottom-heavy with empty space.
    */
   footer?: React.ReactNode;
   /**
@@ -77,7 +82,16 @@ export function BentoGridItem({
         <h3 className="mt-4 mb-3 text-xl font-semibold">{title}</h3>
         <p className="leading-relaxed text-muted-foreground">{description}</p>
       </div>
-      {footer && <div className="relative mt-auto pt-8">{footer}</div>}
+      {footer && (
+        <>
+          {/* Two thirds of the slack above, one third below. `min-h-6` is the
+              floor for a cell with no slack to give — a single-row cell, or any
+              cell below md where the spans drop and rows size to content. */}
+          <div aria-hidden className="min-h-6 grow-[2]" />
+          <div className="relative">{footer}</div>
+          <div aria-hidden className="grow" />
+        </>
+      )}
     </div>
   );
 }

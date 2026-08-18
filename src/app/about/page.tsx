@@ -71,11 +71,11 @@ const ladder = [
 // paragraph above them raises ("one specific job" — such as?) and they carry the
 // bottom half of a cell that is two rows tall.
 const aiExamples = [
-  "Reading and extracting from documents",
-  "Triaging and routing incoming work",
-  "Drafting replies for someone to approve",
-  "Answering from your own records",
-  "Summarising long histories",
+  "Pulling order details from supplier PDFs into your system, instead of someone retyping them",
+  "Reading every inbound enquiry and sending it to the right person with the context attached",
+  "Drafting the quote reply for a salesperson to check and send in one click",
+  "Answering 'what did we agree with this client last year?' from your own files, not from memory",
+  "Turning a two-year case history into a one-page summary before the meeting",
 ];
 
 // Framed by the situation the reader is in rather than by our capability. The
@@ -85,25 +85,25 @@ const aiExamples = [
 const calledIn = [
   {
     icon: Sparkles,
-    title: "You want AI in the business and cannot tell what is real",
+    title: "You want AI in your business without betting the business on it.",
     // Roughly twice the length of the others, plus the footer list below. This
     // cell spans two rows, so it is as tall as the two cards beside it and
     // needs about their combined content to not read as empty.
     description:
-      "Everyone is being sold AI, and most of what gets demonstrated is a demo. The useful version is narrower and duller than the pitch: it does one specific job inside a process you already run, and someone checks the output before it counts for anything. That checking is most of the engineering. These tools will hand you something that looks right whether it is or not, so we start by finding the job worth doing rather than the technology worth buying. We have built chatbots, full AI-enabled platforms and multi-agent systems, and the pattern that works is always the same: a narrow job, a clear definition of correct, and something checking the answer.",
-    lead: true,
+      "There are two ways in. The first is low risk: give your team AI tools that speed up the work they already do. The second goes deeper: build AI into your systems themselves, so it runs your processes rather than assisting them. Each suits different businesses, budgets and appetites for risk. We build both, and we run both. Our own platforms use the Claude API in production, and our own delivery process is AI-assisted from first design to final release. Colchester.Network sat on a registered domain for years because the build cost was too high. AI-assisted development dramatically lowered the risk, and we shipped it in eight weeks. So when we talk about risk and reward, it comes from operating experience. We will show you what is possible in your organisation today, that is safe and secure to use.",    lead: true,
   },
   {
+
     icon: Server,
     title: "A legacy system you can now afford to replace",
     description:
-      "The quotes came in at six figures and the business case never closed. That number has moved. AI-assisted delivery takes real time out of a rebuild, and the saving shows up in the price rather than in our margin.",
+      "You have a legacy system that is old, outdated and clunky. Your whole team hates it, but the cost of replacing it is too high. Our Full Stack Dev + AI Engineering techniques allow us to build a new system that is modern, efficient and tailored to your needs, at a price that is affordable. We can help you transition smoothly and ensure that your new system meets all your requirements.",
   },
   {
     icon: FileSpreadsheet,
     title: "The spreadsheet became the system",
     description:
-      "It started as one person's tracker and now the business runs on it. Nobody wants to touch it, the person who built it has left, and a bad paste breaks something three tabs away.",
+      "Spreadsheets are great for a while, but they are not a system. They are not secure, they are not scalable, and they are not reliable. We can help you replace your spreadsheet with a proper system that is designed to meet your needs, and that will grow with your business.",
   },
   {
     icon: Wrench,
@@ -373,7 +373,7 @@ export default async function AboutPage() {
                     item.lead ? (
                       <>
                         <p className="text-sm font-semibold text-foreground">
-                          What one specific job looks like
+                          Jobs we give AI
                         </p>
                         <ul className="mt-3 flex flex-wrap gap-2">
                           {aiExamples.map((example) => (
