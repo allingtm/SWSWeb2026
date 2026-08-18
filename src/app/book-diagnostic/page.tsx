@@ -34,19 +34,19 @@ const deliverables = [
     icon: Workflow,
     title: "Your process mapped",
     description:
-      "How the work actually runs today, written down — including the parts nobody has documented. Those are the parts that derail a build, so they are the first thing we go looking for.",
+      "How the work actually runs today, written down. That includes the parts nobody has documented, which is usually where a build comes unstuck. So it's where we start.",
   },
   {
     icon: FileText,
     title: "A written specification",
     description:
-      "What the software needs to do, in enough detail that any competent developer could quote from it. That level of detail is what makes a fixed price possible in the first place.",
+      "What the software needs to do, in enough detail that any competent developer could quote from it. Ours or anyone else's. That detail is what stops a build being repriced halfway through.",
   },
   {
     icon: Tag,
     title: "A fixed price to build it",
     description:
-      "A firm number, not a range. We can commit to one because we have built systems like yours before and know what the work takes. Yours to keep whether or not we work together.",
+      "A firm number, not a range. We can quote one because we've built systems like yours before and we know where the time goes. Yours to keep whether or not we work together.",
   },
 ];
 
@@ -99,10 +99,10 @@ export default async function BookDiagnosticPage() {
 
                 <div className="mt-10 border-t border-dashed border-border pt-8">
                   <p className="max-w-xl leading-relaxed text-muted-foreground">
-                    We have been mapping processes and specifying software for
-                    UK businesses since 2012. The diagnostic is where every one
-                    of those projects started, because it is the part that
-                    decides whether the rest goes right.
+                    We&apos;ve been mapping processes and writing specifications
+                    for UK businesses since 2012. Every build we have delivered
+                    started here. Get this part wrong and no amount of good code
+                    will save your project.
                   </p>
                 </div>
 
