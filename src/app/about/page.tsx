@@ -5,218 +5,288 @@ import { Container } from "@/components/ui/container";
 import { TrackedButtonLink } from "@/components/ui/tracked-button-link";
 import { TrackedLink } from "@/components/ui/tracked-link";
 import { ProjectsCarousel } from "@/components/about/projects-carousel";
+import { BentoGrid, BentoGridItem } from "@/components/ui/bento-grid";
+import { GlowingEffect } from "@/components/ui/glowing-effect";
+// Lives under components/pricing/ but is a generic decorative primitive;
+// /book-diagnostic already imports it from there for the same reason.
+import { DottedBackground } from "@/components/pricing/grid-lines";
+import { JsonLd } from "@/components/seo/json-ld";
 import { getNavCategories } from "@/lib/supabase/queries";
 import { generateMetadata as generateSiteMetadata } from "@/lib/seo/metadata";
+import {
+  generateLocalBusinessSchema,
+  generateBreadcrumbSchema,
+} from "@/lib/seo/structured-data";
 import { siteConfig } from "@/lib/seo/constants";
-import { Code, Smartphone, Settings, Sparkles, MapPin, Calendar, Users, Award } from "lucide-react";
+import {
+  Sparkles,
+  Server,
+  FileSpreadsheet,
+  Wrench,
+  ArrowLeftRight,
+  Smartphone,
+  PoundSterling,
+  KeyRound,
+  Timer,
+  ShieldCheck,
+} from "lucide-react";
 
 export const metadata: Metadata = generateSiteMetadata({
-  title: "About Us",
-  description: "Solve With Software Ltd is a software development consultancy based in Colchester, Essex. Since 2012, we have been delivering custom software solutions, web applications, and mobile apps for businesses across the UK.",
+  title: "About — Colchester Software Consultancy",
+  description:
+    "Software development consultancy in Colchester, Essex. Custom web, mobile and AI systems for UK businesses since 2012. Fixed prices, published up front.",
   path: "/about",
 });
 
-const services = [
+export const revalidate = 60;
+
+// The three stages, summarised from /pricing. Figures are repeated here rather
+// than imported because /pricing owns the full terms and this is the short
+// version. If a number changes there, it has to change here too.
+const ladder = [
   {
-    icon: Code,
-    title: "Web Applications",
-    description: "Modern, responsive web applications built with cutting-edge technologies including Next.js, React, and .NET. Scalable solutions designed to grow with your business.",
+    step: 1,
+    name: "Diagnostic",
+    price: "£950 + VAT",
+    description:
+      "We come to you and map how the work actually runs, including the parts nobody has written down. You get a specification and a fixed price to build it, yours to keep whether or not we go further.",
   },
   {
-    icon: Smartphone,
-    title: "Mobile Development",
-    description: "Cross-platform mobile applications using Flutter, delivering native performance on iOS and Android from a single codebase.",
+    step: 2,
+    name: "Build phases",
+    price: "£12,000-£15,000",
+    description:
+      "One process at a time, working, in your hands in about six weeks. Not a prototype. You decide whether to continue at the end of each phase.",
   },
   {
-    icon: Settings,
-    title: "Custom Software",
-    description: "Bespoke software solutions tailored to your specific business requirements. From internal tools to customer-facing platforms.",
-  },
-  {
-    icon: Sparkles,
-    title: "AI Solutions",
-    description: "Intelligent automation and AI integration to streamline operations, enhance decision-making, and unlock new capabilities.",
+    step: 3,
+    name: "Care plan",
+    price: "18% a year",
+    description:
+      "Support, hosting, small changes and priority access once you are live. Sold as part of phase one, cancellable on 30 days' notice.",
   },
 ];
 
+// Concrete jobs, listed in the lead cell's footer. They answer the question the
+// paragraph above them raises ("one specific job" — such as?) and they carry the
+// bottom half of a cell that is two rows tall.
+const aiExamples = [
+  "Reading and extracting from documents",
+  "Triaging and routing incoming work",
+  "Drafting replies for someone to approve",
+  "Answering from your own records",
+  "Summarising long histories",
+];
+
+// Framed by the situation the reader is in rather than by our capability. The
+// carousel above already proves what we build and the stack below already lists
+// what we build it with; this section exists so someone can recognise their own
+// week and work out whether to call.
+const calledIn = [
+  {
+    icon: Sparkles,
+    title: "You want AI in the business and cannot tell what is real",
+    // Roughly twice the length of the others, plus the footer list below. This
+    // cell spans two rows, so it is as tall as the two cards beside it and
+    // needs about their combined content to not read as empty.
+    description:
+      "Everyone is being sold AI, and most of what gets demonstrated is a demo. The useful version is narrower and duller than the pitch: it does one specific job inside a process you already run, and someone checks the output before it counts for anything. That checking is most of the engineering. These tools will hand you something that looks right whether it is or not, so we start by finding the job worth doing rather than the technology worth buying. We have built chatbots, full AI-enabled platforms and multi-agent systems, and the pattern that works is always the same: a narrow job, a clear definition of correct, and something checking the answer.",
+    lead: true,
+  },
+  {
+    icon: Server,
+    title: "A legacy system you can now afford to replace",
+    description:
+      "The quotes came in at six figures and the business case never closed. That number has moved. AI-assisted delivery takes real time out of a rebuild, and the saving shows up in the price rather than in our margin.",
+  },
+  {
+    icon: FileSpreadsheet,
+    title: "The spreadsheet became the system",
+    description:
+      "It started as one person's tracker and now the business runs on it. Nobody wants to touch it, the person who built it has left, and a bad paste breaks something three tabs away.",
+  },
+  {
+    icon: Wrench,
+    title: "Internal systems are now affordable",
+    description:
+      "The tool that would save your team an hour a day never made it up the list, because building it cost more than the hour was worth. The floor has come down. Small internal systems are worth costing again.",
+  },
+  {
+    icon: ArrowLeftRight,
+    title: "Two systems that will not talk",
+    description:
+      "Someone is retyping data from one screen into another, and by Friday the two disagree. Often the fix is an integration rather than a replacement, and we will tell you if it is.",
+  },
+  {
+    icon: Smartphone,
+    title: "Your customers expect it on their phone",
+    description:
+      "Booking, ordering, tracking, account access — the things people used to ring up for. Native where it needs to be native, and honest about when a good mobile website would have done the job.",
+  },
+];
+
+// Every one of these is a commitment published elsewhere on the site, not a
+// sentiment. If one stops being true on /pricing, it has to change here too.
 const differentiators = [
   {
-    icon: MapPin,
-    title: "UK-Based",
-    description: "Based in Colchester, Essex, we provide local expertise with a personal touch. Face-to-face meetings and UK timezone availability.",
+    icon: PoundSterling,
+    title: "Our prices are on the website",
+    description:
+      "Most development companies will not publish theirs. A fixed price also means the risk of an overrun sits with us rather than you, which is where it belongs.",
   },
   {
-    icon: Calendar,
-    title: "Established Since 2012",
-    description: "Over a decade of experience delivering successful software projects across diverse industries and technologies.",
+    icon: KeyRound,
+    title: "You own the result",
+    description:
+      "Full source code and ownership transfer to you on final payment. No licence, no lock-in, no charge for leaving, and mainstream technology any competent developer can pick up.",
   },
   {
-    icon: Users,
-    title: "Partnership Approach",
-    description: "We work as an extension of your team, understanding your business goals and translating them into effective technical solutions.",
+    icon: Timer,
+    title: "Something working in six weeks",
+    description:
+      "Each phase takes one process and gets it live. Soon enough to find out whether we understood how you work, before you commit to anything bigger.",
   },
   {
-    icon: Award,
-    title: "Quality-Focused",
-    description: "Commitment to clean code, thorough testing, and maintainable architectures that stand the test of time.",
+    icon: ShieldCheck,
+    title: "Fourteen years in serious sectors",
+    description:
+      "NHS services, UK retail banking, group litigation, haulage and construction. Regulated work teaches you to specify carefully first, because being wrong costs more than a late release.",
+  },
+];
+
+const expertise = [
+  {
+    title: "Frontend",
+    technologies: "React, Next.js, Angular, TypeScript, Tailwind CSS, shadcn/ui",
+  },
+  {
+    title: "Backend",
+    technologies: ".NET, C#, Node.js, Python, PostgreSQL, MS SQL Server, Supabase",
+  },
+  {
+    title: "Mobile",
+    technologies: "Flutter, Dart, React Native, iOS, Android",
+  },
+  {
+    title: "Cloud & DevOps",
+    technologies: "Azure, AWS, Cloudflare, Vercel, Docker, GitHub Actions, CI/CD",
+  },
+  {
+    title: "AI & Automation",
+    technologies: "Anthropic Claude, OpenAI, MCP, RAG, Agentic Workflows, Process Automation",
+  },
+  {
+    title: "Integration",
+    technologies: "REST APIs, GraphQL, Webhooks, Stripe, SendGrid, Third-party Services",
   },
 ];
 
 export default async function AboutPage() {
   const navCategories = await getNavCategories();
+  const phoneHref = `tel:${siteConfig.phone.replace(/-/g, "")}`;
+
+  const localBusinessSchema = generateLocalBusinessSchema();
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: "Home", url: siteConfig.url },
+    { name: "About", url: `${siteConfig.url}/about` },
+  ]);
 
   return (
     <>
+      <JsonLd data={localBusinessSchema} id="local-business" />
+      <JsonLd data={breadcrumbSchema} id="breadcrumb-about" />
       <Header categories={navCategories} />
       <main className="min-h-screen">
-        {/* Hero Section */}
-        <section className="py-16 md:py-24 bg-gradient-to-b from-muted/50 to-background">
-          <Container className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              About Solve With Software
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                We deliver tailored business IT systems that meet your exact needs. Our team is dedicated to helping businesses
-              solve complex challenges through elegant, efficient and cost-effective technology solutions.
-            </p>
+        {/* Hero — same 5/7 split and dot texture as the /pricing hero, so this
+            page reads as part of that set rather than a plainer template. The
+            gradient stays because the band below is also unmuted; without it
+            the two run together. */}
+        <section className="relative overflow-hidden py-16 md:py-24 bg-linear-to-b from-muted/50 to-background">
+          <DottedBackground />
+          <Container className="relative max-w-[60rem]">
+            <div className="grid items-center gap-8 md:grid-cols-12 md:gap-12">
+              <h1 className="text-4xl font-bold leading-[1.05] tracking-tight md:col-span-5 md:text-5xl lg:text-6xl">
+                We are Full Stack Devs + AI Engineers
+              </h1>
+              <p className="text-lg leading-relaxed text-muted-foreground md:col-span-7">
+                A software consultancy in Colchester, building custom systems
+                for UK businesses since 2012. Fixed prices, published up front.
+                One process at a time, working, in your hands.
+              </p>
+            </div>
           </Container>
         </section>
 
-        {/* About Section */}
+        {/* Who We Are */}
         <section className="py-16">
           <Container className="max-w-4xl">
-            <div className="prose prose-lg dark:prose-invert mx-auto">
-              <h2 className="text-3xl font-bold mb-6">Who We Are</h2>
+            <div className="mx-auto">
+              <h2 className="text-3xl font-bold mb-6 tracking-tight">Who we are</h2>
               <p className="text-muted-foreground leading-relaxed mb-6">
-                Solve With Software Ltd is a software development consultancy headquartered
-                in Colchester, Essex. Founded in 2012, we have spent over a decade building
-                custom software solutions for businesses across the United Kingdom.
+                Solve With Software Ltd is a software development consultancy in
+                Colchester, Essex. We started in 2012, which makes this our
+                fourteenth year building custom systems for businesses across the
+                United Kingdom.
               </p>
               <p className="text-muted-foreground leading-relaxed mb-6">
-                Our approach centres on understanding your business objectives first, then
-                applying the most appropriate technologies to achieve them. We believe that
-                successful software projects are built on clear communication, technical
-                excellence, and a genuine partnership between our team and yours.
+                Much of that work has been in sectors where getting it wrong is
+                expensive: NHS mental health services, UK retail banking, group
+                litigation, haulage and construction. Regulated industries are
+                unforgiving of vagueness. They teach you to be careful about what
+                you promise and precise about what you deliver.
               </p>
               <p className="text-muted-foreground leading-relaxed">
-                Whether you need a web application, mobile app, API integration, or AI-powered
-                automation, we have the expertise to deliver solutions that make a measurable
-                impact on your business.
+                That is why we map your process before we quote, put a fixed price
+                on the build so the risk of an overrun is ours, and deliver one
+                process at a time. You see something real in about six weeks,
+                rather than finding out at the end whether we understood you.
               </p>
             </div>
           </Container>
         </section>
 
-        {/* Services Section */}
-        <section className="py-16 bg-muted/30">
-          <Container>
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4">Our Services</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                We offer a comprehensive range of software development services,
-                each delivered with the same commitment to quality and results.
-              </p>
-            </div>
-            <div className="grid md:grid-cols-2 gap-8">
-              {services.map((service) => (
-                <div
-                  key={service.title}
-                  className="bg-background rounded-xl p-6 border border-border hover:border-primary/50 transition-colors"
-                >
-                  <service.icon className="h-10 w-10 text-primary mb-4" />
-                  <h3 className="text-xl font-semibold mb-3">{service.title}</h3>
-                  <p className="text-muted-foreground">{service.description}</p>
-                </div>
-              ))}
-            </div>
-          </Container>
-        </section>
-
-        {/* Projects Section */}
-        <section className="py-16 overflow-hidden">
+        {/* Projects */}
+        <section className="py-16 overflow-hidden bg-muted/30">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-4">
-              <h2 className="text-3xl font-bold mb-4">Where We Have Delivered</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                Over a decade of projects across regulated, high-stakes sectors
-                where reliability and security are not optional.
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold mb-4 tracking-tight">
+                Where we have delivered
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                Fourteen years of projects across regulated, high-stakes sectors
+                where reliability and security are not optional. Select any card
+                for more on the work.
               </p>
             </div>
           </div>
           <ProjectsCarousel />
         </section>
 
-        {/* Expertise Section */}
+        {/* Why work with us */}
         <section className="py-16">
-          <Container className="max-w-4xl">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4">Our Expertise</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                Our team brings deep technical knowledge across modern development
-                platforms and frameworks.
-              </p>
-            </div>
-            <div className="grid md:grid-cols-3 gap-6 text-center">
-              <div className="p-6">
-                <h3 className="font-semibold mb-2">Frontend</h3>
-                <p className="text-sm text-muted-foreground">
-                  React, Next.js, TypeScript, Tailwind CSS
-                </p>
-              </div>
-              <div className="p-6">
-                <h3 className="font-semibold mb-2">Backend</h3>
-                <p className="text-sm text-muted-foreground">
-                  .NET, Node.js, PostgreSQL, Supabase
-                </p>
-              </div>
-              <div className="p-6">
-                <h3 className="font-semibold mb-2">Mobile</h3>
-                <p className="text-sm text-muted-foreground">
-                  Flutter, Dart, iOS, Android
-                </p>
-              </div>
-              <div className="p-6">
-                <h3 className="font-semibold mb-2">Cloud & DevOps</h3>
-                <p className="text-sm text-muted-foreground">
-                  Azure, AWS, Vercel, CI/CD
-                </p>
-              </div>
-              <div className="p-6">
-                <h3 className="font-semibold mb-2">AI & Automation</h3>
-                <p className="text-sm text-muted-foreground">
-                  OpenAI, LLM Integration, Process Automation
-                </p>
-              </div>
-              <div className="p-6">
-                <h3 className="font-semibold mb-2">Integration</h3>
-                <p className="text-sm text-muted-foreground">
-                  REST APIs, GraphQL, Third-party Services
-                </p>
-              </div>
-            </div>
-          </Container>
-        </section>
-
-        {/* Why Choose Us Section */}
-        <section className="py-16 bg-muted/30">
           <Container>
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4">Why Choose Us</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                What sets Solve With Software apart from other development consultancies.
+              <h2 className="text-3xl font-bold mb-4 tracking-tight">
+                Why work with us
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                Four things you can hold us to, rather than four things everybody
+                says.
               </p>
             </div>
             <div className="grid md:grid-cols-2 gap-8">
               {differentiators.map((item) => (
                 <div key={item.title} className="flex gap-4">
-                  <div className="flex-shrink-0">
+                  <div className="shrink-0">
                     <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
                       <item.icon className="h-6 w-6 text-primary" />
                     </div>
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
-                    <p className="text-muted-foreground">{item.description}</p>
+                    <p className="text-muted-foreground leading-relaxed">
+                      {item.description}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -224,25 +294,183 @@ export default async function AboutPage() {
           </Container>
         </section>
 
-        {/* CTA Section */}
-        <section className="py-16 md:py-24">
-          <Container className="text-center">
-            <h2 className="text-3xl font-bold mb-4">Ready to Start Your Project?</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto mb-8">
-              Get in touch to discuss how we can help bring your software vision to life.
-              We would be delighted to learn about your requirements and explore how we can work together.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <TrackedButtonLink
+        {/* How the work is structured — the /pricing ladder in short form */}
+        <section className="py-16 bg-muted/30">
+          <Container className="max-w-4xl">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold mb-4 tracking-tight">
+                How the work is structured
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                Three stages, each priced before you commit to it. Everything
+                starts with a paid diagnostic, because a build quoted without one
+                is a guess wearing a number.
+              </p>
+            </div>
+            <div className="grid gap-6 md:grid-cols-3">
+              {ladder.map((item) => (
+                <div
+                  key={item.name}
+                  className="rounded-xl border border-border bg-background p-6"
+                >
+                  <span
+                    className="mb-4 flex h-8 w-8 items-center justify-center rounded-full bg-muted text-sm font-semibold tabular-nums text-foreground"
+                    aria-hidden="true"
+                  >
+                    {item.step}
+                  </span>
+                  <h3 className="text-xl font-semibold">{item.name}</h3>
+                  <p className="mt-1 text-sm font-semibold text-primary tabular-nums">
+                    {item.price}
+                  </p>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                    {item.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <p className="mt-8 text-center text-sm text-muted-foreground">
+              Payment terms, what is included, what is not, and the answers to the
+              awkward questions are all on the{" "}
+              <TrackedLink
                 href="/pricing"
-                size="lg"
+                className="text-primary underline-offset-4 hover:underline"
                 event="about_cta_click"
                 eventProps={{ target: "pricing" }}
               >
-                See what it costs
+                pricing page
+              </TrackedLink>
+              .
+            </p>
+          </Container>
+        </section>
+
+        {/* Where we get called in — the reader's situation, not our capability */}
+        <section className="py-16">
+          <Container>
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold mb-4 tracking-tight">
+                Where we usually get called in
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                Six situations that come up again and again. If one of them
+                sounds like your week, we have built the way out of it before.
+              </p>
+            </div>
+            {/* The lead cell spans 2x2, so auto-placement fills the rest around
+                it: card 2 and 3 stack in the third column, cards 4-6 form the
+                bottom row. Below md the spans drop and everything stacks in DOM
+                order, which still puts the lead first. */}
+            <BentoGrid>
+              {calledIn.map((item) => (
+                <BentoGridItem
+                  key={item.title}
+                  className={item.lead ? "md:col-span-2 md:row-span-2" : undefined}
+                  icon={<item.icon className="h-10 w-10 text-primary" />}
+                  title={item.title}
+                  description={item.description}
+                  footer={
+                    item.lead ? (
+                      <>
+                        <p className="text-sm font-semibold text-foreground">
+                          What one specific job looks like
+                        </p>
+                        <ul className="mt-3 flex flex-wrap gap-2">
+                          {aiExamples.map((example) => (
+                            <li
+                              key={example}
+                              className="rounded-md border border-border bg-background/60 px-3 py-1 text-sm text-muted-foreground"
+                            >
+                              {example}
+                            </li>
+                          ))}
+                        </ul>
+                      </>
+                    ) : undefined
+                  }
+                >
+                  {/* Same signal as the "Start here" card on /pricing and the
+                      booking card on /book-diagnostic: this is the one that
+                      matters most in its section. */}
+                  {item.lead && (
+                    <GlowingEffect
+                      variant="brand"
+                      spread={38}
+                      glow
+                      disabled={false}
+                      proximity={72}
+                      inactiveZone={0.01}
+                      borderWidth={2}
+                    />
+                  )}
+                </BentoGridItem>
+              ))}
+            </BentoGrid>
+            <p className="mt-8 text-center text-sm text-muted-foreground">
+              Whatever the situation, we build bespoke systems that meet your
+              exact business needs, using the latest methods and technologies.{" "}
+              <TrackedLink
+                href="/pricing"
+                className="text-primary underline-offset-4 hover:underline"
+                event="about_cta_click"
+                eventProps={{ target: "pricing", location: "called-in" }}
+              >
+                Book a diagnostic to get started
+              </TrackedLink>
+              .
+            </p>
+          </Container>
+        </section>
+
+        {/* Expertise */}
+        <section className="py-16 bg-muted/30">
+          <Container className="max-w-4xl">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold mb-4 tracking-tight">
+                What we build with
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                The stack we are working in during 2026. It looks nothing like the
+                2012 list and will look different again in three years. Knowing
+                which tool fits which problem is the part that carries over.
+              </p>
+            </div>
+            <div className="grid md:grid-cols-3 gap-6 text-center">
+              {expertise.map((item) => (
+                <div key={item.title} className="p-6">
+                  <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {item.technologies}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </Container>
+        </section>
+
+        {/* CTA */}
+        <section className="py-16 md:py-24">
+          <Container className="text-center">
+            <h2 className="text-3xl font-bold mb-4 tracking-tight">
+              Start with the diagnostic
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed">
+              £950 + VAT. We come to you, map the process with whoever runs it day
+              to day, and give you a written specification and a fixed price to
+              build it within five working days. Yours to keep whether or not you
+              use us to build it.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <TrackedButtonLink
+                href="/book-diagnostic"
+                size="lg"
+                event="about_cta_click"
+                eventProps={{ target: "book-diagnostic" }}
+              >
+                Book a diagnostic
               </TrackedButtonLink>
               <TrackedButtonLink
-                href={`tel:${siteConfig.phone.replace(/-/g, "")}`}
+                href={phoneHref}
                 variant="outline"
                 size="lg"
                 external
@@ -252,7 +480,16 @@ export default async function AboutPage() {
               </TrackedButtonLink>
             </div>
             <p className="mt-6 text-sm text-muted-foreground">
-              Not ready for that?{" "}
+              Want the numbers first?{" "}
+              <TrackedLink
+                href="/pricing"
+                className="text-primary underline-offset-4 hover:underline"
+                event="about_cta_click"
+                eventProps={{ target: "pricing" }}
+              >
+                See what it costs
+              </TrackedLink>
+              . Not ready for either?{" "}
               <TrackedLink
                 href="/contact"
                 className="text-primary underline-offset-4 hover:underline"
