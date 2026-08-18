@@ -34,19 +34,19 @@ const deliverables = [
     icon: Workflow,
     title: "Your process mapped",
     description:
-      "How the work actually runs today, written down — including the parts nobody has documented.",
+      "How the work actually runs today, written down — including the parts nobody has documented. Those are the parts that derail a build, so they are the first thing we go looking for.",
   },
   {
     icon: FileText,
     title: "A written specification",
     description:
-      "What the software needs to do, in enough detail that any competent developer could quote from it.",
+      "What the software needs to do, in enough detail that any competent developer could quote from it. That level of detail is what makes a fixed price possible in the first place.",
   },
   {
     icon: Tag,
     title: "A fixed price to build it",
     description:
-      "A firm number, not a range. Yours to keep whether or not we work together.",
+      "A firm number, not a range. We can commit to one because we have built systems like yours before and know what the work takes. Yours to keep whether or not we work together.",
   },
 ];
 
@@ -97,7 +97,16 @@ export default async function BookDiagnosticPage() {
                   specification, and a fixed price to build it. Ready for you to approve before we start the work.
                 </p>
 
-                <ul className="mt-10 space-y-6 border-t border-dashed border-border pt-8">
+                <div className="mt-10 border-t border-dashed border-border pt-8">
+                  <p className="max-w-xl leading-relaxed text-muted-foreground">
+                    We have been mapping processes and specifying software for
+                    UK businesses since 2012. The diagnostic is where every one
+                    of those projects started, because it is the part that
+                    decides whether the rest goes right.
+                  </p>
+                </div>
+
+                <ul className="mt-8 space-y-6">
                   {deliverables.map((item) => (
                     <li key={item.title} className="flex gap-4">
                       <span
